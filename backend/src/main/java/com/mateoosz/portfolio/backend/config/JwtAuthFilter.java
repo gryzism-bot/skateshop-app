@@ -2,8 +2,6 @@ package com.mateoosz.portfolio.backend.config;
 
 import com.mateoosz.portfolio.backend.service.JwtService;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,11 +21,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     @Override
-protected void doFilterInternal(HttpServletRequest request,
+    protected void doFilterInternal(HttpServletRequest request,
                                HttpServletResponse response,
                                FilterChain filterChain)
         throws ServletException, IOException {
 
+    System.out.println("FILTER HIT: " + request.getRequestURI());
+            
     String authHeader = request.getHeader("Authorization");
 
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -41,7 +41,7 @@ protected void doFilterInternal(HttpServletRequest request,
         var claims = jwtService.extractAllClaims(token);
         String role = claims.get("role", String.class);
 
-        // 🔒 Example: protect product endpoints
+        // protect product endpoints
         if (request.getRequestURI().startsWith("/api/products") && !"ADMIN".equals(role)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;

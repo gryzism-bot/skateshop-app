@@ -1,11 +1,11 @@
 ### Get all products
 GET http://localhost:8080/api/products
-Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzc1NTU4NDczLCJleHAiOjE3NzU1NjIwNzN9.hqC9Rhka4FLCLIICR2NrKAEssDL2w_MOnocgwvpOjfo
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTU3NTM1MCwiZXhwIjoxNzc1NTc4OTUwfQ.PLW8NUVZ9caruMVgonQq1oE3I4bkLHdGe3mvDqbnQTU
 
 ### Create product
 POST http://localhost:8080/api/products
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzc1NTU4NDczLCJleHAiOjE3NzU1NjIwNzN9.hqC9Rhka4FLCLIICR2NrKAEssDL2w_MOnocgwvpOjfo
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTU3NTAzMCwiZXhwIjoxNzc1NTc4NjMwfQ.aTp5ZWAjwpiCNWXz39DYBoR-4cABx7os30blCDYj8_o
 
 {
   "name": "Test Skates3",
@@ -17,9 +17,11 @@ Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzc1
 
 ### create cart
 POST http://localhost:8080/api/cart
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTU3NTM1MCwiZXhwIjoxNzc1NTc4OTUwfQ.PLW8NUVZ9caruMVgonQq1oE3I4bkLHdGe3mvDqbnQTU
 
 ### Get cart
 GET http://localhost:8080/api/cart/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTU3NTM1MCwiZXhwIjoxNzc1NTc4OTUwfQ.PLW8NUVZ9caruMVgonQq1oE3I4bkLHdGe3mvDqbnQTU
 
 ### put to cart
 POST http://localhost:8080/api/cart/1/add/2?quantity=1
@@ -28,7 +30,7 @@ POST http://localhost:8080/api/cart/1/add/2?quantity=1
 POST http://localhost:8080/api/cart/1/add/1?quantity=2
 
 ### register user
-POST http://localhost:8080/api/auth/register?email=test2@test.com&password=1234&role=ADMIN
+POST http://localhost:8080/api/auth/register?email=test@test.com&password=1234&role=ADMIN
 
 ### login user
 POST http://localhost:8080/api/auth/login?email=test@test.com&password=1234
