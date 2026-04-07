@@ -57,3 +57,6 @@ Authorization: Bearer <token>
 
 * CLIENT → shopping
 * ADMIN → product management
+
+
+http://localhost:8080/swagger-ui/index.html

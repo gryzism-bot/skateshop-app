@@ -20,6 +20,11 @@ public class ProductService {
         return repository.findAll();
     }
 
+    public Product getProductById(Long id) {
+        return repository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Product not found"));
+    }
+
     public Product createProduct(Product product) {
         validateProduct(product);
         return repository.save(product);
