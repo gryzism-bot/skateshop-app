@@ -4,4 +4,8 @@
   <img [src]="product.imageUrl" width="150" />
   <h3>{{ product.name }}</h3>
   <p>{{ product.price }} PLN</p>
+
+  <button (click)="addToCart(product.id)">
+    Add to cart 🛒
+  </button>
 </div>

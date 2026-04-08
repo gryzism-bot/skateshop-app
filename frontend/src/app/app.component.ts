@@ -20,4 +20,11 @@ export class AppComponent implements OnInit {
       this.products = data;
     });
   }
+
+  addToCart(productId: number) {
+  this.productService.addToCart(productId).subscribe({
+    next: () => console.log("Added to cart:", productId),
+    error: err => console.error("Error adding to cart", err)
+  });
+}
 }

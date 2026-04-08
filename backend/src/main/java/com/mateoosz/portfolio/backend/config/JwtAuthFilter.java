@@ -66,10 +66,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
 
             // CLIENT-only endpoints
-            if (uri.startsWith("/api/cart") &&
-                !("CLIENT".equals(role) || "ADMIN".equals(role))) {
+            // if (uri.startsWith("/api/cart") &&
+            //     !("CLIENT".equals(role) || "ADMIN".equals(role))) {
 
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            //     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            //     return;
+            // } temporary allow all on cart until frontend token
+
+            if (uri.startsWith("/api/cart")) {
+                filterChain.doFilter(request, response);
                 return;
             }
 
