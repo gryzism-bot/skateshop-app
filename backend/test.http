@@ -1,6 +1,6 @@
 ### Get all products
 GET http://localhost:8080/api/products
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTY1MzkyNSwiZXhwIjoxNzc1NjU3NTI1fQ.iydxEEj-kT59inmzodhVtgV4BTDpI_igf80el26dLv8
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTY4ODY4NiwiZXhwIjoxNzc1NjkyMjg2fQ.LhzAqe4mMkPPt04-KduW-1860GmXU_kpOoDwODP3ZFg
 
 ### Create product
 POST http://localhost:8080/api/products
@@ -17,7 +17,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZ
 
 ### create cart
 POST http://localhost:8080/api/cart
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTY1MzkyNSwiZXhwIjoxNzc1NjU3NTI1fQ.iydxEEj-kT59inmzodhVtgV4BTDpI_igf80el26dLv8
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTY4ODY4NiwiZXhwIjoxNzc1NjkyMjg2fQ.LhzAqe4mMkPPt04-KduW-1860GmXU_kpOoDwODP3ZFg
 
 ### Get cart
 GET http://localhost:8080/api/cart/1

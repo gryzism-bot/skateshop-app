@@ -1,7 +1,6 @@
 package com.mateoosz.portfolio.backend.config;
 
 import com.mateoosz.portfolio.backend.service.JwtService;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,36 +21,64 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                               HttpServletResponse response,
-                               FilterChain filterChain)
-        throws ServletException, IOException {
+                                   HttpServletResponse response,
+                                   FilterChain filterChain)
+            throws ServletException, IOException {
 
-    System.out.println("FILTER HIT: " + request.getRequestURI());
-            
-    String authHeader = request.getHeader("Authorization");
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
 
-    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-        filterChain.doFilter(request, response);
-        return;
-    }
+        System.out.println("FILTER HIT: " + method + " " + uri);
 
-    String token = authHeader.substring(7);
-
-    try {
-        var claims = jwtService.extractAllClaims(token);
-        String role = claims.get("role", String.class);
-
-        // protect product endpoints
-        if (request.getRequestURI().startsWith("/api/products") && !"ADMIN".equals(role)) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        // 1. PUBLIC endpoints (no auth required)
+        if (uri.startsWith("/api/products") && method.equals("GET")) {
+            filterChain.doFilter(request, response);
             return;
         }
 
-    } catch (Exception e) {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        return;
-    }
+        // (optional future public endpoints)
+        if (uri.startsWith("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-    filterChain.doFilter(request, response);
+        // 2. Require token for everything else
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        String token = authHeader.substring(7);
+
+        try {
+            var claims = jwtService.extractAllClaims(token);
+            String role = claims.get("role", String.class);
+
+            // 3. ADMIN-only actions
+            if (uri.startsWith("/api/products") &&
+                (method.equals("POST") || method.equals("PUT") || method.equals("DELETE")) &&
+                !"ADMIN".equals(role)) {
+
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+
+            // CLIENT-only endpoints
+            if (uri.startsWith("/api/cart") &&
+                !("CLIENT".equals(role) || "ADMIN".equals(role))) {
+
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        // 4. Allow request
+        filterChain.doFilter(request, response);
     }
 }
