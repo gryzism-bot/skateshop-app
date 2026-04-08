@@ -1,6 +1,6 @@
 ### Get all products
 GET http://localhost:8080/api/products
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTU3NTM1MCwiZXhwIjoxNzc1NTc4OTUwfQ.PLW8NUVZ9caruMVgonQq1oE3I4bkLHdGe3mvDqbnQTU
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTY1MzkyNSwiZXhwIjoxNzc1NjU3NTI1fQ.iydxEEj-kT59inmzodhVtgV4BTDpI_igf80el26dLv8
 
 ### Create product
 POST http://localhost:8080/api/products
@@ -17,7 +17,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZ
 
 ### create cart
 POST http://localhost:8080/api/cart
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTU3NTM1MCwiZXhwIjoxNzc1NTc4OTUwfQ.PLW8NUVZ9caruMVgonQq1oE3I4bkLHdGe3mvDqbnQTU
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTY1MzkyNSwiZXhwIjoxNzc1NjU3NTI1fQ.iydxEEj-kT59inmzodhVtgV4BTDpI_igf80el26dLv8
 
 ### Get cart
 GET http://localhost:8080/api/cart/1
@@ -30,7 +30,7 @@ POST http://localhost:8080/api/cart/1/add/2?quantity=1
 POST http://localhost:8080/api/cart/1/add/1?quantity=2
 
 ### register user
-POST http://localhost:8080/api/auth/register?email=test@test.com&password=1234&role=ADMIN
+POST http://localhost:8080/api/auth/register?email=test@test.com&password=1234
 
 ### login user
 POST http://localhost:8080/api/auth/login?email=test@test.com&password=1234
