@@ -73,6 +73,8 @@ public class CartService {
                 itemDTO.setProductId(item.getProduct().getId());
                 itemDTO.setProductName(item.getProduct().getName());
                 itemDTO.setQuantity(item.getQuantity());
+                itemDTO.setProductPrice(item.getProduct().getPrice());
+                itemDTO.setImageUrl(item.getProduct().getImageUrl());
                 return itemDTO;
             }).toList();
 

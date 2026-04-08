@@ -19,6 +19,8 @@ public class Product {
     private String description;
     private int stock;
 
+    private String imageUrl;
+
     @Enumerated(EnumType.STRING)
     private Category category;
 
