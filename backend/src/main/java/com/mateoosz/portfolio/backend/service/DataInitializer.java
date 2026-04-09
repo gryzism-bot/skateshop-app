@@ -1,26 +1,76 @@
 package com.mateoosz.portfolio.backend.service;
 
-import com.mateoosz.portfolio.backend.model.Role;
-import com.mateoosz.portfolio.backend.model.User;
+import com.mateoosz.portfolio.backend.model.*;
+import com.mateoosz.portfolio.backend.repository.ProductRepository;
 import com.mateoosz.portfolio.backend.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class DataInitializer {
 
     @Bean
-    CommandLineRunner init(UserRepository userRepository) {
+    CommandLineRunner initData(UserRepository userRepository,
+                               ProductRepository productRepository,
+                               PasswordEncoder passwordEncoder) {
         return args -> {
+
+            // ADMIN user
             if (userRepository.findByEmail("admin@test.com").isEmpty()) {
                 User admin = new User();
                 admin.setEmail("admin@test.com");
-                admin.setPassword("1234");
+                admin.setPassword(passwordEncoder.encode("admin123")); // 🔐 encoded
                 admin.setRole(Role.ADMIN);
 
                 userRepository.save(admin);
+                System.out.println("✅ Admin user created");
+            }
 
+            // CLIENT user
+            if (userRepository.findByEmail("user@test.com").isEmpty()) {
+                User user = new User();
+                user.setEmail("user@test.com");
+                user.setPassword(passwordEncoder.encode("1234")); // 🔐 encoded
+                user.setRole(Role.CLIENT);
+
+                userRepository.save(user);
+                System.out.println("✅ Client user created");
+            }
+
+            // Sample products (only if empty)
+            if (productRepository.count() == 0) {
+
+                Product skates = new Product();
+                skates.setName("Freeskate X");
+                skates.setCategory(Category.SKATES);
+                skates.setType(ProductType.FREESKATE);
+                skates.setPrice(500);
+                skates.setStock(10);
+                skates.setImageUrl("https://images.unsplash.com/photo-1596464716127-f2a82984de30");
+
+                Product wheels = new Product();
+                wheels.setName("Speed Wheels 80mm");
+                wheels.setCategory(Category.ACCESSORIES);
+                wheels.setType(ProductType.WHEELS);
+                wheels.setPrice(120);
+                wheels.setStock(20);
+                wheels.setImageUrl("https://images.unsplash.com/photo-1600180758890-6b94519a8ba6");
+
+                Product pads = new Product();
+                pads.setName("Crash Pads Set");
+                pads.setCategory(Category.ACCESSORIES);
+                pads.setType(ProductType.CRASHPADS);
+                pads.setPrice(150);
+                pads.setStock(15);
+                pads.setImageUrl("https://images.unsplash.com/photo-1600180758890-6b94519a8ba6");
+
+                productRepository.save(skates);
+                productRepository.save(wheels);
+                productRepository.save(pads);
+
+                System.out.println("✅ Sample products created");
             }
         };
     }
