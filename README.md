@@ -1,5 +1,7 @@
 Skateshop dummy app: Springboot backend, Angular frontend, Playwright tests
 
+UNDER CONSTRUCTION
+
 docker-compose up --build
 
 register user, login, add admin with h2 console or sql

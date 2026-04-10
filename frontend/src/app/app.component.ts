@@ -31,23 +31,23 @@ export class AppComponent implements OnInit {
     console.log("ASSIGNED:", this.products);
   });
 
-  console.log("INITIAL:", this.products);
-}
+    console.log("INITIAL:", this.products);
+  }
 
   login(email: string, password: string) {
     this.authService.login(email, password).subscribe({
-      next: (token: any) => {
+      next: (token: string) => {
         this.authService.saveToken(token);
         console.log("Logged in!");
     },
     error: err => console.error("Login failed", err)
-  });
-}
+    });
+  }
 
   addToCart(productId: number) {
     this.productService.addToCart(productId).subscribe({
       next: () => console.log("Added to cart:", productId),
       error: err => console.error("Error adding to cart", err)
-  });
-}
+    });
+  }
 }

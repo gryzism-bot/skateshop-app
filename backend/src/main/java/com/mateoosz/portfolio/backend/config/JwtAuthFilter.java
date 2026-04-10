@@ -30,6 +30,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         System.out.println("FILTER HIT: " + method + " " + uri);
 
+        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // 1. PUBLIC endpoints (no auth required)
         if (uri.startsWith("/api/products") && method.equals("GET")) {
             filterChain.doFilter(request, response);

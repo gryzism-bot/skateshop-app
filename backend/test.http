@@ -17,14 +17,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsInJvb
 
 ### create cart
 POST http://localhost:8080/api/cart
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTY4ODY4NiwiZXhwIjoxNzc1NjkyMjg2fQ.LhzAqe4mMkPPt04-KduW-1860GmXU_kpOoDwODP3ZFg
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTgzMDU0NiwiZXhwIjoxNzc1ODM0MTQ2fQ._p2-udIx3E9s2Uxz2rFhPh7_3IF21D3JdIfnnglvR70
 
 ### Get cart
 GET http://localhost:8080/api/cart/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTU3NTM1MCwiZXhwIjoxNzc1NTc4OTUwfQ.PLW8NUVZ9caruMVgonQq1oE3I4bkLHdGe3mvDqbnQTU
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTgzMjYzMCwiZXhwIjoxNzc1ODM2MjMwfQ.m5ZXlkLTotoQ9WSclOyYyFqtnQNT9GIUH7J48NPeFKg
 
 ### put to cart
 POST http://localhost:8080/api/cart/1/add/2?quantity=1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTgzMDY3MCwiZXhwIjoxNzc1ODM0MjcwfQ.hSt3PIXQ_0hd2AwMKgXP-wa9_gR2R-qC2Bn-Ig6OBF8
 
 ### put 2 to cart
 POST http://localhost:8080/api/cart/1/add/1?quantity=2
@@ -33,4 +34,4 @@ POST http://localhost:8080/api/cart/1/add/1?quantity=2
 POST http://localhost:8080/api/auth/register?email=test@test.com&password=1234
 
 ### login user
-POST http://localhost:8080/api/auth/login?email=admin@test.com&password=admin123
+POST http://localhost:8080/api/auth/login?email=test@test.com&password=1234
