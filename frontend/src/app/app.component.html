@@ -1,17 +1,22 @@
 <h1>🛹 Skate Shop</h1>
 
-<!-- 🔐 LOGIN SECTION -->
+<!-- 🔐 LOGIN -->
 <div style="margin-bottom: 20px;">
   <input #email placeholder="email" />
   <input #password placeholder="password" type="password" />
   <button (click)="login(email.value, password.value)">
     Login
   </button>
+  <button (click)="logout()">Logout</button>
 </div>
 
-<!-- 🛍️ PRODUCT LIST -->
+<hr>
+
+<!-- 🛍️ PRODUCTS -->
+<h2>Products</h2>
+
 <div *ngFor="let product of products"
-     style="margin:20px; border:1px solid #ccc; padding:10px; width:220px; display:inline-block; vertical-align:top;">
+     style="margin:10px; border:1px solid #ccc; padding:10px; width:220px; display:inline-block; vertical-align:top;">
 
   <img [src]="product.imageUrl"
        alt="product image"
@@ -25,5 +30,36 @@
   <button (click)="addToCart(product.id)">
     Add to cart 🛒
   </button>
+</div>
+
+<hr>
+
+<!-- 🛒 CART -->
+<h2>🛒 Cart</h2>
+
+<div *ngIf="cart; else emptyCart">
+
+  <div *ngFor="let item of cart.items"
+       style="border:1px solid #aaa; padding:10px; margin:10px; width:250px;">
+
+    <img [src]="item.imageUrl"
+         width="100"
+         style="display:block; margin-bottom:10px;" />
+
+    <h4>{{ item.productName }}</h4>
+
+    <p>Quantity: {{ item.quantity }}</p>
+
+    <p>Price: {{ item.price }} PLN</p>
+
+  </div>
+
+  <!-- 💰 TOTAL -->
+  <h3>Total: {{ cart.totalPrice }} PLN</h3>
 
 </div>
+
+<!-- 🪹 EMPTY STATE -->
+<ng-template #emptyCart>
+  <p>Your cart is empty</p>
+</ng-template>

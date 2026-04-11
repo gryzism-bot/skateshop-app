@@ -1,53 +1,94 @@
+import { ChangeDetectorRef } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 import { ProductService } from './services/product.service';
+import { CartService } from './services/cart.service';
 import { AuthService } from './services/auth.service';
-import { ChangeDetectorRef } from '@angular/core';
+
+import { Product } from './models/product.model';
+import { Cart } from './models/cart.model';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule], 
+  imports: [CommonModule],
   templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
 
-  products: any[] = [];
+  products: Product[] = [];
+  cart: Cart | null = null;
 
   constructor(
     private productService: ProductService,
+    private cartService: CartService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
-  this.productService.getProducts().subscribe(data => {
-    console.log("DATA RECEIVED:", data);
-
-    this.products = data;
-
-    this.cdr.detectChanges(); 
-
-    console.log("ASSIGNED:", this.products);
-  });
-
-    console.log("INITIAL:", this.products);
+  // 🔁 Lifecycle
+  ngOnInit(): void {
+    this.loadProducts();
+    this.loadCart();
+    this.changeDetectorRef.detectChanges();
   }
 
-  login(email: string, password: string) {
+  // 🛍️ Products
+  private loadProducts(): void {
+    this.productService.getProducts().subscribe({
+      next: (products: Product[]) => {
+        console.log("PRODUCTS:", products); 
+        this.products = products;
+        this.changeDetectorRef.detectChanges(); // todo: workaround
+      },
+      error: (err) => {
+        console.error("Products error:", err); 
+      }
+    });
+  }
+
+  // 🛒 Cart
+  private loadCart(): void {
+    this.cartService.getCart(1).subscribe({
+      next: (cart: Cart) => {
+        console.log("CART:", cart); 
+        this.cart = cart;
+        this.changeDetectorRef.detectChanges();
+      },
+      error: (err) => {
+        console.error("Cart error:", err); 
+      }
+    });
+  }
+
+  addToCart(productId: number): void {
+    this.cartService.addToCart(1, productId, 1).subscribe({
+      next: () => {
+        console.log("Added to cart:", productId); 
+        this.loadCart(); // refresh cart
+      },
+      error: (err) => {
+        console.error("Add to cart error:", err);
+      }
+    });
+  }
+
+  // 🔐 Auth
+  login(email: string, password: string): void {
     this.authService.login(email, password).subscribe({
       next: (token: string) => {
         this.authService.saveToken(token);
         console.log("Logged in!");
-    },
-    error: err => console.error("Login failed", err)
+      },
+      error: (err) => {
+        console.error("Login failed", err);
+      }
     });
   }
 
-  addToCart(productId: number) {
-    this.productService.addToCart(productId).subscribe({
-      next: () => console.log("Added to cart:", productId),
-      error: err => console.error("Error adding to cart", err)
-    });
+  logout(): void {
+    this.authService.logout();
+    console.log("Logged out");
   }
 }
