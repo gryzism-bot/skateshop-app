@@ -22,6 +22,10 @@ public class JwtService {
         .compact();
     }
 
+    public String extractUsername(String token) {
+        return extractAllClaims(token).getSubject();
+    }
+
     public String extractEmail(String token) {
         return Jwts.parserBuilder()
             .setSigningKey(key)

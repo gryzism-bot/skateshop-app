@@ -1,27 +1,23 @@
 package com.mateoosz.portfolio.backend.controller;
 
-import org.springframework.web.bind.annotation.PostMapping;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.mateoosz.portfolio.backend.model.Order;
 import com.mateoosz.portfolio.backend.service.OrderService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
 
-    private final OrderService service;
+    private final OrderService orderService;
 
-    public OrderController(OrderService service) {
-        this.service = service;
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
     }
 
-    @PostMapping("/create")
-    public Order create(@RequestParam Long cartId,
-                        @RequestParam String email) {
-        return service.createOrder(cartId, email);
+    // 🧾 Checkout (no cartId!)
+    @PostMapping
+    public Order createOrder(HttpServletRequest request) {
+        return orderService.createOrder(request);
     }
 }

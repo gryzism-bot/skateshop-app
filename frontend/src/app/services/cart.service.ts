@@ -13,14 +13,11 @@ export class CartService {
 
   constructor(private http: HttpClient) {}
 
-  getCart(cartId: number): Observable<Cart> {
-    return this.http.get<Cart>(`${this.api}/${cartId}`);
+  getCart() {
+    return this.http.get<Cart>(`${this.api}`);
   }
 
-  addToCart(cartId: number, productId: number, quantity: number): Observable<void> {
-    return this.http.post<void>(
-      `${this.api}/${cartId}/add/${productId}?quantity=${quantity}`,
-      {}
-    );
+  addToCart(productId: number, quantity: number) {
+    return this.http.post(`${this.api}/add/${productId}?quantity=${quantity}`, {});
   }
 }

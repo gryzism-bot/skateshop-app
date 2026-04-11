@@ -1,42 +1,31 @@
 package com.mateoosz.portfolio.backend.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.mateoosz.portfolio.backend.model.Cart;
 import com.mateoosz.portfolio.backend.service.CartService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
 
-    private final CartService service;
+    private final CartService cartService;
 
-    public CartController(CartService service) {
-        this.service = service;
+    public CartController(CartService cartService) {
+        this.cartService = cartService;
     }
 
-    @GetMapping("/{id}")
-        public Cart getCart(@PathVariable Long id) {
-            return service.getCart(id);
+    // 🛒 Add product (no cartId!)
+    @PostMapping("/add/{productId}")
+    public Cart addToCart(@PathVariable Long productId,
+                         @RequestParam int quantity,
+                         HttpServletRequest request) {
+        return cartService.addToCart(productId, quantity, request);
     }
 
-    @PostMapping
-    public Cart createCart() {
-        Cart cart = new Cart();
-        return service.save(cart);
-    }
-
-    @PostMapping("/{cartId}/add/{productId}")
-    public Cart addProduct(
-        @PathVariable Long cartId,
-        @PathVariable Long productId,
-        @RequestParam int quantity
-    ) {
-        return service.addProduct(cartId, productId, quantity);
+    // 📦 Get current user's cart
+    @GetMapping
+    public Cart getMyCart(HttpServletRequest request) {
+        return cartService.getMyCart(request);
     }
 }

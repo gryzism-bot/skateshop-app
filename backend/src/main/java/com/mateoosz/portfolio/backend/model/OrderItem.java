@@ -11,12 +11,16 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String productName;
-    private double price;
-    private int quantity;
-
-    private String orderEmail;
-
+    // 📦 which order
     @ManyToOne
     private Order order;
+
+    // 🛍️ which product
+    @ManyToOne
+    private Product product;
+
+    private int quantity;
+
+    private double price;
+
 }

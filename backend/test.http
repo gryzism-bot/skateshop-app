@@ -20,15 +20,15 @@ POST http://localhost:8080/api/cart
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTgzMDU0NiwiZXhwIjoxNzc1ODM0MTQ2fQ._p2-udIx3E9s2Uxz2rFhPh7_3IF21D3JdIfnnglvR70
 
 ### Get cart
-GET http://localhost:8080/api/cart/1
+GET http://localhost:8080/api/cart
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTgzMjYzMCwiZXhwIjoxNzc1ODM2MjMwfQ.m5ZXlkLTotoQ9WSclOyYyFqtnQNT9GIUH7J48NPeFKg
 
 ### put to cart
-POST http://localhost:8080/api/cart/1/add/2?quantity=1
+POST http://localhost:8080/api/cart/add/2?quantity=1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTgzMDY3MCwiZXhwIjoxNzc1ODM0MjcwfQ.hSt3PIXQ_0hd2AwMKgXP-wa9_gR2R-qC2Bn-Ig6OBF8
 
 ### put 2 to cart
-POST http://localhost:8080/api/cart/1/add/1?quantity=2
+POST http://localhost:8080/api/cart/add/1?quantity=2
 
 ### register user
 POST http://localhost:8080/api/auth/register?email=test@test.com&password=1234
