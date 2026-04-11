@@ -31,7 +31,6 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
     this.loadCart();
-    this.changeDetectorRef.detectChanges();
   }
 
   // 🛍️ Products
