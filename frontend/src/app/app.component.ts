@@ -50,7 +50,7 @@ export class AppComponent implements OnInit {
 
   // 🛒 Cart
   private loadCart(): void {
-    this.cartService.getCart(1).subscribe({
+    this.cartService.getCart().subscribe({
       next: (cart: Cart) => {
         console.log("CART:", cart); 
         this.cart = cart;
@@ -63,7 +63,7 @@ export class AppComponent implements OnInit {
   }
 
   addToCart(productId: number): void {
-    this.cartService.addToCart(1, productId, 1).subscribe({
+    this.cartService.addToCart(productId, 1).subscribe({
       next: () => {
         console.log("Added to cart:", productId); 
         this.loadCart(); // refresh cart

@@ -18,7 +18,7 @@ export class ProductService {
 
   addToCart(productId: number) {
   return this.http.post(
-    `http://localhost:8080/api/cart/1/add/${productId}?quantity=1`,
+    `http://localhost:8080/api/cart/add/${productId}?quantity=1`,
     {}
     );
   }
