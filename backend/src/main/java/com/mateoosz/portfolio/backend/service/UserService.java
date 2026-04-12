@@ -1,44 +1,57 @@
 package com.mateoosz.portfolio.backend.service;
 
-import com.mateoosz.portfolio.backend.exception.NotFoundException;
-import com.mateoosz.portfolio.backend.model.*;
+import com.mateoosz.portfolio.backend.model.User;
 import com.mateoosz.portfolio.backend.repository.UserRepository;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
 
-    private final UserRepository repository;
-    private final JwtService jwtService;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository,
-                   JwtService jwtService,
-                   PasswordEncoder passwordEncoder) {
-        this.repository = repository;
-        this.jwtService = jwtService;
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User register(String email, String password) {
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password)); 
-        user.setRole(Role.CLIENT);
+    // 🧾 Register new user
+    public User register(User user) {
 
-        return repository.save(user);
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new RuntimeException("Email is required");
+        }
+
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            throw new RuntimeException("Password is required");
+        }
+
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("User with this email already exists");
+        }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        return userRepository.save(user);
     }
 
-    public String login(String email, String password) {
-    User user = repository.findByEmail(email)
-        .orElseThrow(() -> new NotFoundException("User not found"));
-
-    if (!passwordEncoder.matches(password, user.getPassword())) {
-        throw new IllegalArgumentException("Invalid password");
+    // 🔍 Find user (used by services)
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    return jwtService.generateToken(user.getEmail(), user.getRole().name());
+    // 🔐 Validate login (optional if you already have AuthService)
+    public User validateLogin(String email, String rawPassword) {
+
+        User user = findByEmail(email);
+
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        return user;
     }
 }

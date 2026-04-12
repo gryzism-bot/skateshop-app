@@ -1,7 +1,6 @@
 package com.mateoosz.portfolio.backend.service;
 
-import com.mateoosz.portfolio.backend.exception.NotFoundException;
-import com.mateoosz.portfolio.backend.model.*;
+import com.mateoosz.portfolio.backend.model.Product;
 import com.mateoosz.portfolio.backend.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -10,58 +9,40 @@ import java.util.List;
 @Service
 public class ProductService {
 
-    private final ProductRepository repository;
+    private final ProductRepository productRepository;
 
-    public ProductService(ProductRepository repository) {
-        this.repository = repository;
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
-    public List < Product > getAllProducts() {
-        return repository.findAll();
+    public List<Product> getAll() {
+        return productRepository.findAll();
     }
 
-    public Product getProductById(Long id) {
-        return repository.findById(id)
-            .orElseThrow(() -> new NotFoundException("Product not found"));
+    public Product getById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
-    public Product createProduct(Product product) {
-        validateProduct(product);
-        return repository.save(product);
+    public Product create(Product product) {
+        return productRepository.save(product);
     }
 
-    private void validateProduct(Product product) {
-        if (product.getCategory() == Category.SKATES &&
-            (product.getType() == ProductType.LINERS ||
-                product.getType() == ProductType.WHEELS ||
-                product.getType() == ProductType.CRASHPADS)) {
+    public Product update(Long id, Product updated) {
+        Product product = getById(id); // ✅ ensures existence
 
-            throw new IllegalArgumentException("Invalid type for skates");
-        }
+        product.setName(updated.getName());
+        product.setPrice(updated.getPrice());
+        product.setCategory(updated.getCategory());
+        product.setType(updated.getType());
+        product.setStock(updated.getStock());
+        product.setImageUrl(updated.getImageUrl());
+
+        return productRepository.save(product);
     }
 
-    public Product updateProduct(Long id, Product updatedProduct) {
-        Product existing = repository.findById(id)
-            .orElseThrow(() -> new NotFoundException("Product not found"));
-
-        // update fields
-        existing.setName(updatedProduct.getName());
-        existing.setDescription(updatedProduct.getDescription());
-        existing.setPrice(updatedProduct.getPrice());
-        existing.setCategory(updatedProduct.getCategory());
-        existing.setType(updatedProduct.getType());
-        existing.setStock(updatedProduct.getStock());
-
-        // validate AFTER updating values
-        validateProduct(existing);
-
-        return repository.save(existing);
-    }
-
-    public void deleteProduct(Long id) {
-    if (!repository.existsById(id)) {
-        throw new NotFoundException("Product not found");
-    }
-    repository.deleteById(id);
+    public void delete(Long id) {
+        Product product = getById(id); // ✅ throws if not found
+        productRepository.delete(product);
     }
 }

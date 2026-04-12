@@ -2,6 +2,8 @@ package com.mateoosz.portfolio.backend.controller;
 
 import com.mateoosz.portfolio.backend.model.Product;
 import com.mateoosz.portfolio.backend.service.ProductService;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,21 +20,24 @@ public class ProductController {
 
     @GetMapping
     public List < Product > getAll() {
-        return service.getAllProducts();
+        return service.getAll();
     }
 
+    @PreAuthorize("hasRole('ADMIN')") // only admin can create/update/delete products
     @PostMapping
     public Product create(@RequestBody Product product) {
-        return service.createProduct(product);
+        return service.create(product);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")   // only admin can create/update/delete products
     @PutMapping("/{id}")
     public Product update(@PathVariable Long id, @RequestBody Product product) {
-        return service.updateProduct(id, product);
+        return service.update(id, product);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")   // only admin can create/update/delete products 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        service.deleteProduct(id);
+        service.delete(id);
     }
 }

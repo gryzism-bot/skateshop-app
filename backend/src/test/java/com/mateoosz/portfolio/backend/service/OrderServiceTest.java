@@ -32,8 +32,7 @@ class OrderServiceTest {
         orderService = new OrderService(
                 orderRepository,
                 cartRepository,
-                userRepository,
-                jwtService
+                userRepository
         );
     }
 
@@ -64,7 +63,7 @@ class OrderServiceTest {
         when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
 
         // 🚀 call
-        Order order = orderService.createOrder(request);
+        Order order = orderService.createOrder();
 
         // ✅ assertions
         assertThat(order.getItems()).hasSize(1);
