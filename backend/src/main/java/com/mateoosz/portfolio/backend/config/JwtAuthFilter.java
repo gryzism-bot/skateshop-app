@@ -47,6 +47,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = authHeader.replace("Bearer ", "");
 
+        System.out.println("FILTER HIT");
+        System.out.println("AUTH HEADER: " + request.getHeader("Authorization"));
+
         try {
             // ✅ validate token (signature, expiration, etc.)
             var claims = jwtService.extractAllClaims(token);
@@ -72,6 +75,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         } catch (Exception e) {
             // ❌ invalid token → reject
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }

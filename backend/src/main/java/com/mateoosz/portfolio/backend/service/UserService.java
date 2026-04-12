@@ -20,6 +20,8 @@ public class UserService {
     // 🧾 Register new user
     public User register(User user) {
 
+        try {
+            
         if (user.getEmail() == null || user.getEmail().isBlank()) {
             throw new RuntimeException("Email is required");
         }
@@ -34,7 +36,13 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Registration failed: " + e.getMessage());
+        }
+        
         return userRepository.save(user);
+
     }
 
     // 🔍 Find user (used by services)

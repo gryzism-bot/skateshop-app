@@ -5,7 +5,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZ
 ### Create product
 POST http://localhost:8080/api/products
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NTc0ODExOSwiZXhwIjoxNzc1NzUxNzE5fQ.fjFYuAZWAo9tY3TWwFsmED2eS-IO8RZv729bmsHJal0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImlhdCI6MTc3NjAzMTUxNCwiZXhwIjoxNzc2MDM1MTE0fQ.svYcm8tbu3PMEt-PspN07FTOL94RAoEHER9u7P61f10
 
 {
   "name": "Test Skates333",
@@ -31,7 +31,19 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZ
 POST http://localhost:8080/api/cart/add/1?quantity=2
 
 ### register user
-POST http://localhost:8080/api/auth/register?email=test@test.com&password=1234
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "user6@test.com",
+  "password": "123"
+}
 
 ### login user
-POST http://localhost:8080/api/auth/login?email=test@test.com&password=1234
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "password": "admin123"
+}

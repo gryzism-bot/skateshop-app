@@ -15,7 +15,7 @@ import java.util.Map;
 @Service
 public class JwtService {
 
-    private final String SECRET = "my-super-secret-key-my-super-secret-key"; // min 32 chars
+    private final String SECRET = "11345678901234567890123456789012"; // min 32 chars
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
@@ -26,7 +26,7 @@ public class JwtService {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRole());
-
+            System.out.println("SECRET USED: " + SECRET);
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(user.getEmail())
@@ -38,6 +38,7 @@ public class JwtService {
 
     // 🔍 Extract all claims (used in filter)
     public Claims extractAllClaims(String token) {
+        System.out.println("SECRET USED: " + SECRET);
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()

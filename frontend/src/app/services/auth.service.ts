@@ -11,8 +11,8 @@ export class AuthService {
 
   login(email: string, password: string) {
   return this.http.post(
-    `${this.api}/login?email=${email}&password=${password}`,
-    {},
+    `${this.api}/login`,
+    { email, password },
     { responseType: 'text' } 
   );
 }
