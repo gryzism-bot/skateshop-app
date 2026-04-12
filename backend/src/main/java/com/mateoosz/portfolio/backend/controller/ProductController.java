@@ -26,7 +26,7 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')") // only admin can create/update/delete products
     @PostMapping
     public Product create(@RequestBody Product product) {
-        return service.create(product);
+        return service.add(product);
     }
 
     @PreAuthorize("hasRole('ADMIN')")   // only admin can create/update/delete products

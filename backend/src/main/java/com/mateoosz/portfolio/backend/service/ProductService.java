@@ -1,6 +1,9 @@
 package com.mateoosz.portfolio.backend.service;
 
 import com.mateoosz.portfolio.backend.model.Product;
+import com.mateoosz.portfolio.backend.model.ProductType;
+import com.mateoosz.portfolio.backend.exception.NotFoundException;
+import com.mateoosz.portfolio.backend.model.Category;
 import com.mateoosz.portfolio.backend.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +24,18 @@ public class ProductService {
 
     public Product getById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
     }
 
-    public Product create(Product product) {
+    public Product add(Product product) {
+        validateProduct(product);
         return productRepository.save(product);
     }
 
     public Product update(Long id, Product updated) {
-        Product product = getById(id); // ✅ ensures existence
+        Product product = getById(id);
+
+        validateProduct(updated);
 
         product.setName(updated.getName());
         product.setPrice(updated.getPrice());
@@ -42,7 +48,23 @@ public class ProductService {
     }
 
     public void delete(Long id) {
-        Product product = getById(id); // ✅ throws if not found
+        Product product = getById(id);
         productRepository.delete(product);
     }
+
+    // business rules
+    private void validateProduct(Product product) {
+
+    if (product.getType() == null || product.getCategory() == null) {
+        throw new RuntimeException("Product type and category are required");
+    }
+
+    boolean skateType =
+            product.getType() == ProductType.FREESKATE
+            || product.getType() == ProductType.SPEEDSKATE;
+
+    if (skateType && product.getCategory() == Category.ACCESSORIES) {
+        throw new RuntimeException("Skate products cannot belong to Accessories");
+    }
+}
 }
