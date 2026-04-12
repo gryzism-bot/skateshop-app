@@ -25,7 +25,7 @@ class ProductServiceTest {
 
         when(repository.findById(1L)).thenReturn(Optional.of(product));
 
-        Product result = service.getProductById(1L);
+        Product result = service.getById(1L);
 
         assertEquals("Skates", result.getName());
     }
@@ -42,7 +42,7 @@ class ProductServiceTest {
 
         when(repository.findAll()).thenReturn(java.util.Arrays.asList(product, product2));
 
-        List<Product> result = service.getAllProducts();
+        List<Product> result = service.getAll();
 
         assertEquals(2, result.size());
     }

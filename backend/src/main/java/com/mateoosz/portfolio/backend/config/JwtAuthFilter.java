@@ -5,10 +5,16 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.stereotype.Component;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -25,70 +31,52 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                    FilterChain filterChain)
             throws ServletException, IOException {
 
-        String uri = request.getRequestURI();
-        String method = request.getMethod();
-
-        System.out.println("FILTER HIT: " + method + " " + uri);
-
-        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
+        // ✅ allow preflight (CORS)
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 1. PUBLIC endpoints (no auth required)
-        if (uri.startsWith("/api/products") && method.equals("GET")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // (optional future public endpoints)
-        if (uri.startsWith("/api/auth")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // 2. Require token for everything else
         String authHeader = request.getHeader("Authorization");
 
+        // ✅ no token → continue (public endpoints will work)
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            filterChain.doFilter(request, response);
             return;
         }
 
-        String token = authHeader.substring(7);
+        String token = authHeader.replace("Bearer ", "");
 
         try {
+            // ✅ validate token (signature, expiration, etc.)
             var claims = jwtService.extractAllClaims(token);
+
+            String email = claims.getSubject();
             String role = claims.get("role", String.class);
 
-            // 3. ADMIN-only actions
-            if (uri.startsWith("/api/products") &&
-                (method.equals("POST") || method.equals("PUT") || method.equals("DELETE")) &&
-                !"ADMIN".equals(role)) {
+            // ✅ map role to Spring format
+            var authorities = List.of(
+                    new SimpleGrantedAuthority("ROLE_" + role)
+            );
 
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                return;
-            }
+            // ✅ create authentication object
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            email,
+                            null,
+                            authorities
+                    );
 
-            // CLIENT-only endpoints
-            // if (uri.startsWith("/api/cart") &&
-            //     !("CLIENT".equals(role) || "ADMIN".equals(role))) {
-
-            //     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            //     return;
-            // } temporary allow all on cart until frontend token
-
-            if (uri.startsWith("/api/cart")) {
-                filterChain.doFilter(request, response);
-                return;
-            }
+            // ✅ set user in SecurityContext
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (Exception e) {
+            // ❌ invalid token → reject
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        // 4. Allow request
+        // ✅ continue request
         filterChain.doFilter(request, response);
     }
 }

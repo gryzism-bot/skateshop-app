@@ -1,64 +1,123 @@
 package com.mateoosz.portfolio.backend.service;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
-
+import com.mateoosz.portfolio.backend.model.User;
+import com.mateoosz.portfolio.backend.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.*;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+class UserServiceTest {
 
-import com.mateoosz.portfolio.backend.model.Role;
-import com.mateoosz.portfolio.backend.model.User;
-import com.mateoosz.portfolio.backend.repository.UserRepository;
+    private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
 
-public class UserServiceTest {
+    private UserService userService;
 
-    private final UserRepository repository = mock(UserRepository.class);
-    private final JwtService jwtService = mock(JwtService.class);
-    private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-    private final UserService service = new UserService(repository, jwtService, passwordEncoder);
-    
-    @Test
-    void shouldLoginSuccessfully() {
-        User user = new User();
-        user.setEmail("test@test.com");
-        user.setPassword("encoded");
-        user.setRole(Role.CLIENT);
+    @BeforeEach
+    void setUp() {
+        userRepository = mock(UserRepository.class);
+        passwordEncoder = mock(PasswordEncoder.class);
 
-        when(repository.findByEmail("test@test.com"))
-            .thenReturn(Optional.of(user));
-
-        when(passwordEncoder.matches("1234", "encoded"))
-            .thenReturn(true);
-
-        when(jwtService.generateToken(anyString(), anyString()))
-            .thenReturn("fake-token");
-
-        String token = service.login("test@test.com", "1234");
-
-        assertNotNull(token);
+        userService = new UserService(userRepository, passwordEncoder);
     }
 
     @Test
-    void shouldFailLoginWithWrongPassword() {
-        PasswordEncoder encoder = new BCryptPasswordEncoder();
+    void shouldRegisterUser() {
+        // given
+        User user = new User();
+        user.setEmail("test@test.com");
+        user.setPassword("123");
+
+        when(userRepository.findByEmail("test@test.com"))
+                .thenReturn(Optional.empty());
+
+        when(passwordEncoder.encode("123"))
+                .thenReturn("encoded");
+
+        when(userRepository.save(any(User.class)))
+                .thenAnswer(i -> i.getArgument(0));
+
+        // when
+        User result = userService.register(user);
+
+        // then
+        assertThat(result.getEmail()).isEqualTo("test@test.com");
+        assertThat(result.getPassword()).isEqualTo("encoded");
+
+        verify(passwordEncoder).encode("123");
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void shouldThrowWhenEmailExists() {
+        // given
+        when(userRepository.findByEmail("test@test.com"))
+                .thenReturn(Optional.of(new User()));
 
         User user = new User();
         user.setEmail("test@test.com");
-        user.setPassword(encoder.encode("1234"));
+        user.setPassword("123");
 
-        when(repository.findByEmail("test@test.com"))
-            .thenReturn(Optional.of(user));
+        // when + then
+        assertThatThrownBy(() -> userService.register(user))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("User with this email already exists");
+    }
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            service.login("test@test.com", "wrong");
-        });
+    @Test
+    void shouldThrowWhenEmailMissing() {
+        // given
+        User user = new User();
+        user.setPassword("123");
+
+        // when + then
+        assertThatThrownBy(() -> userService.register(user))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Email is required");
+    }
+
+    @Test
+    void shouldThrowWhenPasswordMissing() {
+        // given
+        User user = new User();
+        user.setEmail("test@test.com");
+
+        // when + then
+        assertThatThrownBy(() -> userService.register(user))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Password is required");
+    }
+
+    @Test
+    void shouldFindUserByEmail() {
+        // given
+        User user = new User();
+        user.setEmail("test@test.com");
+
+        when(userRepository.findByEmail("test@test.com"))
+                .thenReturn(Optional.of(user));
+
+        // when
+        User result = userService.findByEmail("test@test.com");
+
+        // then
+        assertThat(result).isEqualTo(user);
+    }
+
+    @Test
+    void shouldThrowWhenUserNotFound() {
+        // given
+        when(userRepository.findByEmail("test@test.com"))
+                .thenReturn(Optional.empty());
+
+        // when + then
+        assertThatThrownBy(() -> userService.findByEmail("test@test.com"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("User not found");
     }
 }

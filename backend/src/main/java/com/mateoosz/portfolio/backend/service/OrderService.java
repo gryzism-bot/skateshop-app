@@ -1,10 +1,14 @@
 package com.mateoosz.portfolio.backend.service;
 
-import com.mateoosz.portfolio.backend.model.*;
+import com.mateoosz.portfolio.backend.model.Cart;
+import com.mateoosz.portfolio.backend.model.CartItem;
+import com.mateoosz.portfolio.backend.model.Order;
+import com.mateoosz.portfolio.backend.model.OrderItem;
+import com.mateoosz.portfolio.backend.model.User;
 import com.mateoosz.portfolio.backend.repository.CartRepository;
 import com.mateoosz.portfolio.backend.repository.OrderRepository;
 import com.mateoosz.portfolio.backend.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
+import com.mateoosz.portfolio.backend.security.SecurityUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,61 +19,67 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
-    private final JwtService jwtService;
 
     public OrderService(OrderRepository orderRepository,
                         CartRepository cartRepository,
-                        UserRepository userRepository,
-                        JwtService jwtService) {
+                        UserRepository userRepository) {
         this.orderRepository = orderRepository;
         this.cartRepository = cartRepository;
         this.userRepository = userRepository;
-        this.jwtService = jwtService;
     }
 
-    public Order createOrder(HttpServletRequest request) {
+    // 🧾 Create order from current user's cart
+    public Order createOrder() {
 
-        // 🔐 get user from token
-        String authHeader = request.getHeader("Authorization");
-        String token = authHeader.substring(7);
-        String email = jwtService.extractUsername(token);
+        String email = SecurityUtils.getCurrentUserEmail();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 🛒 get user's cart
         Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        if (cart.getItems().isEmpty()) {
+        if (cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
 
-        // 📦 create order
+        // 🔄 Convert cart items → order items
         Order order = new Order();
         order.setUser(user);
 
-        // convert cart items → order items
         List<OrderItem> orderItems = cart.getItems().stream().map(cartItem -> {
+
+            if (cartItem.getProduct() == null) {
+                throw new RuntimeException("Invalid cart item: product missing");
+            }
+
             OrderItem item = new OrderItem();
             item.setProduct(cartItem.getProduct());
             item.setQuantity(cartItem.getQuantity());
             item.setPrice(cartItem.getProduct().getPrice());
             item.setOrder(order);
+
             return item;
+
         }).toList();
 
         order.setItems(orderItems);
 
-        double total = orderItems.stream()
-                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+        // 💰 Calculate total
+        double totalPrice = orderItems.stream()
+                .mapToDouble(i -> i.getPrice() * i.getQuantity())
                 .sum();
 
-        order.setTotalPrice(total);
+        if (totalPrice <= 0) {
+            throw new RuntimeException("Invalid order total");
+        }
 
+        order.setTotalPrice(totalPrice);
+
+        // 💾 Save order
         Order savedOrder = orderRepository.save(order);
 
-        // 🧹 clear cart after checkout
+        // 🧹 Clear cart AFTER successful save
         cart.getItems().clear();
         cartRepository.save(cart);
 
