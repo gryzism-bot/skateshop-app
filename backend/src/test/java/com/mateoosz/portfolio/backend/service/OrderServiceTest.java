@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,6 +24,7 @@ class OrderServiceTest {
     private OrderService orderService;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         orderRepository = mock(OrderRepository.class);
         cartRepository = mock(CartRepository.class);

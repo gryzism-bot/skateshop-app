@@ -21,6 +21,7 @@ class CartServiceTest {
     private CartService cartService;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         cartRepository = mock(CartRepository.class);
         productRepository = mock(ProductRepository.class);

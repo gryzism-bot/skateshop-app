@@ -1,7 +1,6 @@
 package com.mateoosz.portfolio.backend.service;
 
 import com.mateoosz.portfolio.backend.model.Cart;
-import com.mateoosz.portfolio.backend.model.CartItem;
 import com.mateoosz.portfolio.backend.model.Order;
 import com.mateoosz.portfolio.backend.model.OrderItem;
 import com.mateoosz.portfolio.backend.model.User;
