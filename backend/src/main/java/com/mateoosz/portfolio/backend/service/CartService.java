@@ -8,7 +8,10 @@ import com.mateoosz.portfolio.backend.repository.CartRepository;
 import com.mateoosz.portfolio.backend.repository.ProductRepository;
 import com.mateoosz.portfolio.backend.repository.UserRepository;
 import com.mateoosz.portfolio.backend.security.SecurityUtils;
+
 import org.springframework.stereotype.Service;
+
+import com.mateoosz.portfolio.backend.exception.NotFoundException;
 
 @Service
 public class CartService {
@@ -29,7 +32,7 @@ public class CartService {
         String email = SecurityUtils.getCurrentUserEmail();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         return cartRepository.findByUser(user)
                 .orElseGet(() -> {
@@ -39,17 +42,33 @@ public class CartService {
                 });
     }
 
+    // 📦 Get current user's cart (no auto-create)
+    public Cart getMyCart() {
+
+        String email = SecurityUtils.getCurrentUserEmail();
+
+        System.out.println("Current user email: " + email); // Debug
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        getOrCreateCart(); // Ensure cart exists
+
+        return cartRepository.findByUser(user)
+                .orElseThrow(() -> new NotFoundException("Cart not found"));
+    }
+
     // 🛒 Add product to cart
     public Cart addToCart(Long productId, int quantity) {
 
         if (quantity <= 0) {
-            throw new RuntimeException("Quantity must be greater than 0");
+            throw new IllegalArgumentException("Quantity must be greater than 0");
         }
 
         Cart cart = getOrCreateCart();
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
 
         CartItem existingItem = cart.getItems().stream()
                 .filter(i -> i.getProduct().getId().equals(productId))
@@ -67,18 +86,6 @@ public class CartService {
         }
 
         return cartRepository.save(cart);
-    }
-
-    // 📦 Get current user's cart (no auto-create)
-    public Cart getMyCart() {
-
-        String email = SecurityUtils.getCurrentUserEmail();
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return cartRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
     }
 
     // ❌ Remove product from cart

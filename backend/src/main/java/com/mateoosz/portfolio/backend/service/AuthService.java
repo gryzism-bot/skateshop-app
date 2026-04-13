@@ -6,6 +6,8 @@ import com.mateoosz.portfolio.backend.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.mateoosz.portfolio.backend.exception.NotFoundException;
+import com.mateoosz.portfolio.backend.exception.UnauthorizedException;
 import com.mateoosz.portfolio.backend.model.Role;
 
 @Service
@@ -26,10 +28,10 @@ public class AuthService {
     public String login(String email, String password) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new UnauthorizedException("Invalid password");
         }
 
         return jwtService.generateToken(user);
@@ -38,7 +40,7 @@ public class AuthService {
     public User register(String email, String password) {
 
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new RuntimeException("User already exists");
+            throw new IllegalArgumentException("Email already in use");
         }
 
         User user = new User();
