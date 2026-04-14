@@ -1,12 +1,19 @@
 package com.mateoosz.portfolio.backend.service;
 
-import com.mateoosz.portfolio.backend.model.*;
-import com.mateoosz.portfolio.backend.repository.ProductRepository;
-import com.mateoosz.portfolio.backend.repository.UserRepository;
+import java.util.Random;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.mateoosz.portfolio.backend.model.Category;
+import com.mateoosz.portfolio.backend.model.Product;
+import com.mateoosz.portfolio.backend.model.ProductType;
+import com.mateoosz.portfolio.backend.model.Role;
+import com.mateoosz.portfolio.backend.model.User;
+import com.mateoosz.portfolio.backend.repository.ProductRepository;
+import com.mateoosz.portfolio.backend.repository.UserRepository;
 
 @Configuration
 public class DataInitializer {
@@ -48,15 +55,17 @@ public class DataInitializer {
                 skates.setType(ProductType.FREESKATE);
                 skates.setPrice(500);
                 skates.setStock(10);
+                skates.setDescription(randomString(100)); // random description
                 skates.setImageUrl("https://cdn.bladeville.pl/media/catalog/product/9/0/908435-40847_ps_next_core_black_90_2023_view01.jpg");
 
                 Product skates2 = new Product();
-                skates.setName("Freeskate 2");
-                skates.setCategory(Category.SKATES);
-                skates.setType(ProductType.FREESKATE);
-                skates.setPrice(500);
-                skates.setStock(10);
-                skates.setImageUrl("https://cdn.bladeville.pl/media/catalog/product/0/7/07061300792_rb_110_3wd_photo-outside_side_view.jpg");
+                skates2.setName("Freeskate 2");
+                skates2.setCategory(Category.SKATES);
+                skates2.setType(ProductType.SPEEDSKATE);
+                skates2.setPrice(500);
+                skates2.setStock(10);
+                skates2.setDescription(randomString(100)); // random description
+                skates2.setImageUrl("https://cdn.bladeville.pl/media/catalog/product/0/7/07061300792_rb_110_3wd_photo-outside_side_view.jpg");
 
                 Product wheels = new Product();
                 wheels.setName("Speed Wheels 80mm");
@@ -64,23 +73,37 @@ public class DataInitializer {
                 wheels.setType(ProductType.WHEELS);
                 wheels.setPrice(120);
                 wheels.setStock(20);
+                wheels.setDescription(randomString(100)); // random description
                 wheels.setImageUrl("https://cdn.bladeville.pl/media/catalog/product/i/m/img_2147.jpg");
 
-                Product pads = new Product();
-                pads.setName("Crash Pads Set");
-                pads.setCategory(Category.ACCESSORIES);
-                pads.setType(ProductType.CRASHPADS);
-                pads.setPrice(150);
-                pads.setStock(15);
-                pads.setImageUrl("https://cdn.bladeville.pl/media/catalog/product/d/s/dsdoyi7u.jpg");
+                Product crashPads = new Product();
+                crashPads.setName("Crash Pads Set");
+                crashPads.setCategory(Category.ACCESSORIES);
+                crashPads.setType(ProductType.CRASHPADS);
+                crashPads.setPrice(150);
+                crashPads.setStock(15);
+                crashPads.setDescription(randomString(100)); // random description
+                crashPads.setImageUrl("https://cdn.bladeville.pl/media/catalog/product/d/s/dsdoyi7u.jpg");
 
                 productRepository.save(skates);
                 productRepository.save(skates2);
                 productRepository.save(wheels);
-                productRepository.save(pads);
+                productRepository.save(crashPads);
 
                 System.out.println("✅ Sample products created");
             }
         };
+    }
+
+    private static final String CHARS = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    public static String randomString(int length) {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++) {
+            sb.append(CHARS.charAt(random.nextInt(CHARS.length())));
+        }
+        return sb.toString();
     }
 }

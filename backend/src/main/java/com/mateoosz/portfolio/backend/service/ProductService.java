@@ -1,13 +1,13 @@
 package com.mateoosz.portfolio.backend.service;
 
-import com.mateoosz.portfolio.backend.model.Product;
-import com.mateoosz.portfolio.backend.model.ProductType;
-import com.mateoosz.portfolio.backend.exception.NotFoundException;
-import com.mateoosz.portfolio.backend.model.Category;
-import com.mateoosz.portfolio.backend.repository.ProductRepository;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.mateoosz.portfolio.backend.exception.NotFoundException;
+import com.mateoosz.portfolio.backend.model.Category;
+import com.mateoosz.portfolio.backend.model.Product;
+import com.mateoosz.portfolio.backend.repository.ProductRepository;
 
 @Service
 public class ProductService {
@@ -59,12 +59,19 @@ public class ProductService {
         throw new RuntimeException("Product type and category are required");
     }
 
-    boolean skateType =
-            product.getType() == ProductType.FREESKATE
-            || product.getType() == ProductType.SPEEDSKATE;
+    boolean valid = switch (product.getType()) {
+        case FREESKATE -> product.getCategory() == Category.SKATES;
+        case SPEEDSKATE -> product.getCategory() == Category.SKATES;
 
-    if (skateType && product.getCategory() == Category.ACCESSORIES) {
-        throw new RuntimeException("Skate products cannot belong to Accessories");
+        case CRASHPADS -> product.getCategory() == Category.ACCESSORIES;
+        case LINERS -> product.getCategory() == Category.ACCESSORIES;
+        case WHEELS -> product.getCategory() == Category.ACCESSORIES;
+
+        default -> false;
+    };
+
+    if (!valid) {
+        throw new IllegalArgumentException("Invalid category for product type");
     }
-}
+    }
 }

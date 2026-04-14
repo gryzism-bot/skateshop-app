@@ -1,6 +1,16 @@
 package com.mateoosz.portfolio.backend.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 import lombok.Getter;
 
@@ -13,10 +23,20 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Column(nullable = false)
     private String name;
+
+    @NotNull
+    @Positive
+    @Column(nullable = false)
     private double price;
 
     private String description;
+
+    @NotNull
+    @PositiveOrZero
+    @Column(nullable = false)
     private int stock;
 
     private String imageUrl;
