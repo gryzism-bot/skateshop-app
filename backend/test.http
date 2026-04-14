@@ -15,6 +15,33 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJhZG1pb
   "stock": 5
 }
 
+### Test Create product should fail because business logic of skates not being accessory
+POST http://localhost:8080/api/products
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImlhdCI6MTc3NjExNjcwMiwiZXhwIjoxNzc2MTIwMzAyfQ.aK2mAiTw6IQqDZg08nDC5tK9MGc99CXNvEr5TASjgAA
+
+{
+  "name": "Test Skates333",
+  "category": "SKATES",
+  "type": "CRASHPADS",
+  "price": 500,
+  "stock": 5
+}
+
+### Test Create product should fail because business logic of accessory not being skates
+POST http://localhost:8080/api/products
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImlhdCI6MTc3NjExNjcwMiwiZXhwIjoxNzc2MTIwMzAyfQ.aK2mAiTw6IQqDZg08nDC5tK9MGc99CXNvEr5TASjgAA
+
+{
+  "name": "Test Skates333",
+  "category": "ACCESSORIES",
+  "type": "FREESKATE",
+  "price": 500,
+  "stock": 5
+}
+
+
 ### create cart
 POST http://localhost:8080/api/cart
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTgzMDU0NiwiZXhwIjoxNzc1ODM0MTQ2fQ._p2-udIx3E9s2Uxz2rFhPh7_3IF21D3JdIfnnglvR70

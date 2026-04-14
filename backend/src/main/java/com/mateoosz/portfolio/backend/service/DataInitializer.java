@@ -43,12 +43,20 @@ public class DataInitializer {
             if (productRepository.count() == 0) {
 
                 Product skates = new Product();
-                skates.setName("Freeskate X");
+                skates.setName("Freeskate 1");
                 skates.setCategory(Category.SKATES);
                 skates.setType(ProductType.FREESKATE);
                 skates.setPrice(500);
                 skates.setStock(10);
-                skates.setImageUrl("https://images.unsplash.com/photo-1596464716127-f2a82984de30");
+                skates.setImageUrl("https://cdn.bladeville.pl/media/catalog/product/9/0/908435-40847_ps_next_core_black_90_2023_view01.jpg");
+
+                Product skates2 = new Product();
+                skates.setName("Freeskate 2");
+                skates.setCategory(Category.SKATES);
+                skates.setType(ProductType.FREESKATE);
+                skates.setPrice(500);
+                skates.setStock(10);
+                skates.setImageUrl("https://cdn.bladeville.pl/media/catalog/product/0/7/07061300792_rb_110_3wd_photo-outside_side_view.jpg");
 
                 Product wheels = new Product();
                 wheels.setName("Speed Wheels 80mm");
@@ -56,7 +64,7 @@ public class DataInitializer {
                 wheels.setType(ProductType.WHEELS);
                 wheels.setPrice(120);
                 wheels.setStock(20);
-                wheels.setImageUrl("https://images.unsplash.com/photo-1600180758890-6b94519a8ba6");
+                wheels.setImageUrl("https://cdn.bladeville.pl/media/catalog/product/i/m/img_2147.jpg");
 
                 Product pads = new Product();
                 pads.setName("Crash Pads Set");
@@ -64,9 +72,10 @@ public class DataInitializer {
                 pads.setType(ProductType.CRASHPADS);
                 pads.setPrice(150);
                 pads.setStock(15);
-                pads.setImageUrl("https://images.unsplash.com/photo-1600180758890-6b94519a8ba6");
+                pads.setImageUrl("https://cdn.bladeville.pl/media/catalog/product/d/s/dsdoyi7u.jpg");
 
                 productRepository.save(skates);
+                productRepository.save(skates2);
                 productRepository.save(wheels);
                 productRepository.save(pads);
 
