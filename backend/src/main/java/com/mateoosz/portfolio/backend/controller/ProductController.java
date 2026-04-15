@@ -2,8 +2,6 @@ package com.mateoosz.portfolio.backend.controller;
 
 import java.util.List;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mateoosz.portfolio.backend.model.Product;
+import com.mateoosz.portfolio.backend.dto.ProductRequest;
+import com.mateoosz.portfolio.backend.dto.ProductResponse;
 import com.mateoosz.portfolio.backend.service.ProductService;
 
 import jakarta.validation.Valid;
@@ -21,32 +20,31 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/products")
 public class ProductController {
 
-    private final ProductService service;
+    private final ProductService productService;
 
-    public ProductController(ProductService service) {
-        this.service = service;
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
+
+    @PostMapping
+    public ProductResponse add(@Valid @RequestBody ProductRequest request) {
+        return productService.add(request);
     }
 
     @GetMapping
-    public List < Product > getAll() {
-        return service.getAll();
+    public List<ProductResponse> getAll() {
+        return productService.getAll();
     }
 
-    @PreAuthorize("hasRole('ADMIN')") // only admin can create/update/delete products
-    @PostMapping
-    public Product create(@Valid @RequestBody Product product) {
-        return service.add(product);
+    @GetMapping("/{id}")
+    public ProductResponse getById(@PathVariable Long id) {
+        return productService.getById(id);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")   // only admin can create/update/delete products
     @PutMapping("/{id}")
-    public Product update(@PathVariable Long id, @Valid @RequestBody Product product) {
-        return service.update(id, product);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")   // only admin can create/update/delete products 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    public ProductResponse update(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductRequest request) {
+        return productService.update(id, request);
     }
 }

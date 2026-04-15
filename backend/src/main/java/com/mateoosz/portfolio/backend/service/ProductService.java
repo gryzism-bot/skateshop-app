@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.mateoosz.portfolio.backend.exception.NotFoundException;
+import com.mateoosz.portfolio.backend.dto.ProductRequest;
+import com.mateoosz.portfolio.backend.dto.ProductResponse;
 import com.mateoosz.portfolio.backend.model.Category;
 import com.mateoosz.portfolio.backend.model.Product;
 import com.mateoosz.portfolio.backend.repository.ProductRepository;
@@ -18,41 +19,75 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public List<Product> getAll() {
-        return productRepository.findAll();
+    public List<ProductResponse> getAll() {
+        return productRepository.findAll()
+            .stream()
+            .map(this::mapToResponse)
+            .toList();
     }
 
-    public Product getById(Long id) {
-        return productRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Product not found"));
-    }
+    public ProductResponse getById(Long id) {
+    Product product = productRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Product not found"));
 
-    public Product add(Product product) {
+    return mapToResponse(product);
+}
+
+    public ProductResponse add(ProductRequest request) {
+        Product product = mapToEntity(request);
+
         validateProduct(product);
-        return productRepository.save(product);
+        Product saved = productRepository.save(product);
+
+        return mapToResponse(saved);
     }
 
-    public Product update(Long id, Product updated) {
-        Product product = getById(id);
+    public ProductResponse update(Long id, ProductRequest request) {
 
-        validateProduct(updated);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        product.setName(updated.getName());
-        product.setPrice(updated.getPrice());
-        product.setCategory(updated.getCategory());
-        product.setType(updated.getType());
-        product.setStock(updated.getStock());
-        product.setImageUrl(updated.getImageUrl());
+        product.setName(request.getName());
+        product.setPrice(request.getPrice());
+        product.setStock(request.getStock());
+        product.setCategory(request.getCategory());
+        product.setType(request.getType());
+        product.setImageUrl(request.getImageUrl());
 
-        return productRepository.save(product);
-    }
+        validateProduct(product);
 
-    public void delete(Long id) {
-        Product product = getById(id);
-        productRepository.delete(product);
-    }
+        Product saved = productRepository.save(product);
 
-    // business rules
+        return mapToResponse(saved);
+}
+
+//mapper methods
+
+    private Product mapToEntity(ProductRequest request) {
+        Product product = new Product();
+        product.setName(request.getName());
+        product.setPrice(request.getPrice());
+        product.setStock(request.getStock());
+        product.setCategory(request.getCategory());
+        product.setType(request.getType());
+        product.setImageUrl(request.getImageUrl());
+        return product;
+}
+
+    private ProductResponse mapToResponse(Product product) {
+        ProductResponse response = new ProductResponse();
+        response.setId(product.getId());
+        response.setName(product.getName());
+        response.setPrice(product.getPrice());
+        response.setStock(product.getStock());
+        response.setCategory(product.getCategory());
+        response.setType(product.getType());
+        response.setImageUrl(product.getImageUrl());
+        return response;
+}
+
+// business rules
+
     private void validateProduct(Product product) {
 
     if (product.getType() == null || product.getCategory() == null) {
