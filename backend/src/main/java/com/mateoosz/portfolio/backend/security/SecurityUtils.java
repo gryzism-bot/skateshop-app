@@ -10,10 +10,11 @@ public class SecurityUtils {
     }
 
     public static String getCurrentUserEmail() {
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || auth.getName() == null) {
-            throw new RuntimeException("No authenticated user");
+        if (auth == null || !auth.isAuthenticated() || auth.getPrincipal().equals("anonymousUser")) {
+            return null;
         }
 
         return auth.getName();

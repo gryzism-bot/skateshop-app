@@ -1,5 +1,9 @@
 package com.mateoosz.portfolio.backend.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.mateoosz.portfolio.backend.model.Cart;
 import com.mateoosz.portfolio.backend.model.Order;
 import com.mateoosz.portfolio.backend.model.OrderItem;
@@ -8,9 +12,6 @@ import com.mateoosz.portfolio.backend.repository.CartRepository;
 import com.mateoosz.portfolio.backend.repository.OrderRepository;
 import com.mateoosz.portfolio.backend.repository.UserRepository;
 import com.mateoosz.portfolio.backend.security.SecurityUtils;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class OrderService {
