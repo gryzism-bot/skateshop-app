@@ -8,4 +8,6 @@ import lombok.Data;
 public class CartResponseDTO {
     private Long id;
     private List<CartItemDTO> items;
+
+    private Double totalPrice;
 }

@@ -1,14 +1,13 @@
 package com.mateoosz.portfolio.backend.service;
 
-import com.mateoosz.portfolio.backend.model.User;
-import com.mateoosz.portfolio.backend.repository.UserRepository;
-
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.mateoosz.portfolio.backend.exception.NotFoundException;
-import com.mateoosz.portfolio.backend.exception.UnauthorizedException;
 import com.mateoosz.portfolio.backend.model.Role;
+import com.mateoosz.portfolio.backend.model.User;
+import com.mateoosz.portfolio.backend.repository.UserRepository;
 
 @Service
 public class AuthService {
@@ -31,7 +30,7 @@ public class AuthService {
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new UnauthorizedException("Invalid password");
+            throw new BadCredentialsException("Invalid password");
         }
 
         return jwtService.generateToken(user);

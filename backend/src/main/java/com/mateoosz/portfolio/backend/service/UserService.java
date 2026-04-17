@@ -1,9 +1,10 @@
 package com.mateoosz.portfolio.backend.service;
 
-import com.mateoosz.portfolio.backend.model.User;
-import com.mateoosz.portfolio.backend.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.mateoosz.portfolio.backend.model.User;
+import com.mateoosz.portfolio.backend.repository.UserRepository;
 
 @Service
 public class UserService {

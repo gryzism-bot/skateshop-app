@@ -31,7 +31,16 @@ public class ProductService {
             .orElseThrow(() -> new RuntimeException("Product not found"));
 
     return mapToResponse(product);
-}
+    }
+
+    public ProductResponse delete(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        productRepository.delete(product);
+
+        return mapToResponse(product);
+    }
 
     public ProductResponse add(ProductRequest request) {
         Product product = mapToEntity(request);

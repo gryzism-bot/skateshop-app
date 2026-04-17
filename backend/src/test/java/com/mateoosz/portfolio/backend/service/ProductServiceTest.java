@@ -12,6 +12,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.mateoosz.portfolio.backend.dto.ProductRequest;
+import com.mateoosz.portfolio.backend.dto.ProductResponse;
 import com.mateoosz.portfolio.backend.model.Category;
 import com.mateoosz.portfolio.backend.model.Product;
 import com.mateoosz.portfolio.backend.model.ProductType;
@@ -28,28 +30,31 @@ class ProductServiceTest {
         service = new ProductService(repository);
     }
 
-    // ✅ GET ALL
-
     @Test
     void shouldReturnAllProducts() {
-        List<Product> products = List.of(new Product(), new Product());
-        when(repository.findAll()).thenReturn(products);
+        Product product = new Product();
+        product.setId(1L);
+        product.setName("Skates");
+        product.setCategory(Category.SKATES);
+        product.setType(ProductType.FREESKATE);
 
-        List<Product> result = service.getAll();
+        when(repository.findAll()).thenReturn(List.of(product));
 
-        assertEquals(2, result.size());
+        List<ProductResponse> result = service.getAll();
+
+        assertEquals(1, result.size());
+        assertEquals("Skates", result.get(0).getName());
     }
-
-    // ✅ GET BY ID
 
     @Test
     void shouldReturnProductById() {
         Product product = new Product();
         product.setId(1L);
+        product.setName("Skates");
 
         when(repository.findById(1L)).thenReturn(Optional.of(product));
 
-        Product result = service.getById(1L);
+        ProductResponse result = service.getById(1L);
 
         assertEquals(1L, result.getId());
     }
@@ -66,92 +71,93 @@ class ProductServiceTest {
         assertEquals("Product not found", ex.getMessage());
     }
 
-    // ✅ ADD VALID
-
     @Test
     void shouldAddValidProduct() {
-        Product product = new Product();
-        product.setCategory(Category.SKATES);
-        product.setType(ProductType.FREESKATE);
+        ProductRequest request = new ProductRequest();
+        request.setName("Skates");
+        request.setCategory(Category.SKATES);
+        request.setType(ProductType.FREESKATE);
+        request.setPrice(100.0);
+        request.setStock(10);
 
-        when(repository.save(any(Product.class)))
-                .thenAnswer(i -> i.getArgument(0));
+        Product saved = new Product();
+        saved.setId(1L);
+        saved.setName("Skates");
+        saved.setCategory(Category.SKATES);
+        saved.setType(ProductType.FREESKATE);
+        saved.setPrice(100.0);
+        saved.setStock(10);
 
-        Product result = service.add(product);
+        when(repository.save(any(Product.class))).thenReturn(saved);
 
-        assertEquals(product, result);
+        ProductResponse result = service.add(request);
+
+        assertEquals(1L, result.getId());
+        assertEquals("Skates", result.getName());
     }
 
-    // ❌ ADD INVALID (Freeskate → Accessories)
-
     @Test
-    void shouldThrowWhenFreeskateIsAccessory() {
-        Product product = new Product();
-        product.setCategory(Category.ACCESSORIES);
-        product.setType(ProductType.FREESKATE);
+    void shouldThrowWhenInvalidCategoryForType() {
+         ProductRequest request = validRequest();
+        request.setCategory(Category.ACCESSORIES);
+        request.setType(ProductType.FREESKATE);
 
         RuntimeException ex = assertThrows(
                 RuntimeException.class,
-                () -> service.add(product)
+                () -> service.add(request)
         );
 
         assertEquals("Invalid category for product type", ex.getMessage());
     }
-
-    // ❌ ADD INVALID (Crashpads → Skates)
 
     @Test
     void shouldThrowWhenAccessoryTypeIsInSkatesCategory() {
-        Product product = new Product();
-        product.setCategory(Category.SKATES);
-        product.setType(ProductType.CRASHPADS);
+         ProductRequest request = validRequest();
+        request.setCategory(Category.SKATES);
+        request.setType(ProductType.CRASHPADS);
 
         RuntimeException ex = assertThrows(
                 RuntimeException.class,
-                () -> service.add(product)
+                () -> service.add(request)
         );
 
         assertEquals("Invalid category for product type", ex.getMessage());
     }
 
-    // ✅ UPDATE VALID
-
     @Test
-    void shouldUpdateValidProduct() {
+    void shouldUpdateProduct() {
         Product existing = new Product();
         existing.setId(1L);
 
-        Product updated = new Product();
-        updated.setCategory(Category.SKATES);
-        updated.setType(ProductType.FREESKATE);
+        ProductRequest request = new ProductRequest();
+        request.setName("Updated");
+        request.setCategory(Category.SKATES);
+        request.setType(ProductType.FREESKATE);
+        request.setPrice(200.0);
+        request.setStock(5);
 
         when(repository.findById(1L)).thenReturn(Optional.of(existing));
-        when(repository.save(any(Product.class)))
-                .thenAnswer(i -> i.getArgument(0));
+        when(repository.save(any(Product.class))).thenAnswer(i -> i.getArgument(0));
 
-        Product result = service.update(1L, updated);
+        ProductResponse result = service.update(1L, request);
 
-        assertEquals(ProductType.FREESKATE, result.getType());
+        assertEquals("Updated", result.getName());
     }
-
-    // ❌ UPDATE INVALID
 
     @Test
     void shouldThrowWhenUpdatingInvalidProduct() {
         Product existing = new Product();
         existing.setId(1L);
 
-        Product invalid = new Product();
-        invalid.setCategory(Category.ACCESSORIES);
-        invalid.setType(ProductType.FREESKATE);
+        ProductRequest request = new ProductRequest();
+        request.setCategory(Category.ACCESSORIES);
+        request.setType(ProductType.FREESKATE);
 
         when(repository.findById(1L)).thenReturn(Optional.of(existing));
 
         assertThrows(RuntimeException.class,
-                () -> service.update(1L, invalid));
+                () -> service.update(1L, request));
     }
-
-    // ✅ DELETE
 
     @Test
     void shouldDeleteProduct() {
@@ -165,13 +171,21 @@ class ProductServiceTest {
         verify(repository).delete(product);
     }
 
-    // ❌ DELETE NOT FOUND
-
     @Test
     void shouldThrowWhenDeletingNonExistingProduct() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class,
                 () -> service.delete(1L));
+    }
+
+    private ProductRequest validRequest() {
+        ProductRequest request = new ProductRequest();
+        request.setName("Test");
+        request.setPrice(100.0);
+        request.setStock(10);
+        request.setCategory(Category.SKATES);
+        request.setType(ProductType.FREESKATE);
+        return request;
     }
 }

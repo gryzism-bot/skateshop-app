@@ -1,11 +1,17 @@
 package com.mateoosz.portfolio.backend.controller;
 
-import com.mateoosz.portfolio.backend.model.Cart;
-import com.mateoosz.portfolio.backend.service.CartService;
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.mateoosz.portfolio.backend.dto.CartRequestDTO;
+import com.mateoosz.portfolio.backend.dto.CartResponseDTO;
+import com.mateoosz.portfolio.backend.service.CartService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -17,19 +23,15 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    // 🛒 Add product (no cartId!)
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/add/{productId}")
-    public Cart addToCart(@PathVariable Long productId,
-                         @RequestParam int quantity,
-                         HttpServletRequest request) {
-        return cartService.addToCart(productId, quantity);
-    }
+    @PostMapping("/add")
+    public CartResponseDTO addToCart(@Valid @RequestBody CartRequestDTO request) {
+        return cartService.addToCart(request);
+}
 
-    // 📦 Get current user's cart
     @PreAuthorize("isAuthenticated()")
     @GetMapping
-    public Cart getMyCart(HttpServletRequest request) {
+    public CartResponseDTO getMyCart() {
         return cartService.getMyCart();
     }
 }

@@ -9,4 +9,6 @@ public class CartItemDTO {
     private double productPrice;
     private String imageUrl;
     private int quantity;
+
+    private Double totalPrice;
 }
