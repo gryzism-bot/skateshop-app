@@ -7,7 +7,6 @@ import { CartRequestDTO, CartResponseDTO, CartService } from './services/cart.se
 import { AuthService } from './services/auth.service';
 
 import { Product } from './models/product.model';
-import { Cart } from './models/cart.model';
 
 @Component({
   selector: 'app-root',
