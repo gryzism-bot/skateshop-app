@@ -172,8 +172,10 @@ public class CartService {
 
         dto.setProductId(item.getProduct().getId());
         dto.setProductName(item.getProduct().getName());
+        dto.setImageUrl(item.getProduct().getImageUrl());
         dto.setProductPrice(item.getProduct().getPrice());
         dto.setQuantity(item.getQuantity());
+        dto.setTotalPrice(item.getQuantity() * item.getProduct().getPrice());
 
         return dto;
     }

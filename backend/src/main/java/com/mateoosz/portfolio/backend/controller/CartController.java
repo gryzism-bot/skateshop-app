@@ -1,6 +1,5 @@
 package com.mateoosz.portfolio.backend.controller;
 
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,13 +22,11 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/add")
     public CartResponseDTO addToCart(@Valid @RequestBody CartRequestDTO request) {
         return cartService.addToCart(request);
-}
+    }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public CartResponseDTO getMyCart() {
         return cartService.getMyCart();

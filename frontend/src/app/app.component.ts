@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { ProductService } from './services/product.service';
-import { CartService } from './services/cart.service';
+import { CartRequestDTO, CartResponseDTO, CartService } from './services/cart.service';
 import { AuthService } from './services/auth.service';
 
 import { Product } from './models/product.model';
@@ -18,7 +18,7 @@ import { Cart } from './models/cart.model';
 export class AppComponent implements OnInit {
 
   products: Product[] = [];
-  cart: Cart | null = null;
+  cart: CartResponseDTO | null = null;
 
   constructor(
     private productService: ProductService,
@@ -50,7 +50,7 @@ export class AppComponent implements OnInit {
   // 🛒 Cart
   private loadCart(): void {
     this.cartService.getCart().subscribe({
-      next: (cart: Cart) => {
+      next: (cart: CartResponseDTO) => {
         console.log("CART:", cart); 
         this.cart = cart;
         this.changeDetectorRef.detectChanges();

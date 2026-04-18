@@ -1,6 +1,5 @@
 ### Get all products
 GET http://localhost:8080/api/products
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTY4ODY4NiwiZXhwIjoxNzc1NjkyMjg2fQ.LhzAqe4mMkPPt04-KduW-1860GmXU_kpOoDwODP3ZFg
 
 ### Create product
 POST http://localhost:8080/api/products
@@ -48,7 +47,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZ
 
 ### Get cart
 GET http://localhost:8080/api/cart
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTgzMjYzMCwiZXhwIjoxNzc1ODM2MjMwfQ.m5ZXlkLTotoQ9WSclOyYyFqtnQNT9GIUH7J48NPeFKg
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQ0xJRU5UIiwic3ViIjoidXNlckB0ZXN0LmNvbSIsImlhdCI6MTc3NjQzNjkxMSwiZXhwIjoxNzc2NDQwNTExfQ.kuD8bD1cAgRDj41tPZsfy-Ah16dWXoV-aFlHEpT-jAA
 
 ### put to cart
 POST http://localhost:8080/api/cart/add/2?quantity=1
@@ -71,6 +70,6 @@ POST http://localhost:8080/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "user5@test.com",
+  "email": "user@test.com",
   "password": "123"
 }

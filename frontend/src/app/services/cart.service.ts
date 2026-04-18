@@ -1,22 +1,59 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
-import { Cart } from '../models/cart.model';
+import { Observable } from 'rxjs';
+
+// 📦 DTOs (adjust paths if needed)
+export interface CartItemDTO {
+  productId: number;
+  productName: string;
+  imageUrl: string;
+  price: number;
+  quantity: number;
+  totalPrice: number;
+}
+
+export interface CartResponseDTO {
+  items: CartItemDTO[];
+  totalPrice: number;
+}
+
+export interface CartRequestDTO {
+  productId: number;
+  quantity: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class CartService {
 
-  private api = `${environment.apiUrl}/cart`;
+  private apiUrl = 'http://localhost:8080/api/cart';
 
   constructor(private http: HttpClient) {}
 
-  getCart() {
-    return this.http.get<Cart>(`${this.api}`);
+  // 🛒 Get current cart
+  getCart(): Observable<CartResponseDTO> {
+    return this.http.get<CartResponseDTO>(this.apiUrl);
   }
 
-  addToCart(productId: number, quantity: number) {
-    return this.http.post(`${this.api}/add/${productId}?quantity=${quantity}`, {});
+  // ➕ Add product to cart
+  addToCart(productId: number, quantity: number): Observable<CartResponseDTO> {
+    const body: CartRequestDTO = {
+      productId,
+      quantity
+    };
+
+    return this.http.post<CartResponseDTO>(`${this.apiUrl}/add`, body);
+  }
+
+  // ➖ Remove product from cart
+  removeFromCart(productId: number): Observable<CartResponseDTO> {
+    return this.http.delete<CartResponseDTO>(`${this.apiUrl}/remove/${productId}`);
+  }
+
+  // 🧹 Clear cart (optional, if you implement it)
+  clearCart(): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/clear`);
   }
 }
