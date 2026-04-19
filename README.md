@@ -1,8 +1,8 @@
-# 🛹 SkateShop Backend
+# 🛹 SkateShop App
 
 A simple e-commerce back and frontend for a skate shop built with Spring Boot and Angular
 
-currently: tests in test.http, understanding and adding unit tests, Playwright repo to be implemented after userless cart
+currently: tests in test.http, understanding and adding unit tests, Playwright repo to be implemented after userless cart and order
 
 ## 🚀 Features
 
