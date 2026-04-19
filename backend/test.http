@@ -47,11 +47,17 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZ
 
 ### Get cart
 GET http://localhost:8080/api/cart
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQ0xJRU5UIiwic3ViIjoidXNlckB0ZXN0LmNvbSIsImlhdCI6MTc3NjQzNjkxMSwiZXhwIjoxNzc2NDQwNTExfQ.kuD8bD1cAgRDj41tPZsfy-Ah16dWXoV-aFlHEpT-jAA
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQ0xJRU5UIiwic3ViIjoidXNlckB0ZXN0LmNvbSIsImlhdCI6MTc3NjYyMTQzOSwiZXhwIjoxNzc2NjI1MDM5fQ.uf3dn0WC9zPRCK0Lt5V6y459swPCnJa1rsxl8JrSG6E
 
 ### put to cart
-POST http://localhost:8080/api/cart/add/2?quantity=1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3NTgzMDY3MCwiZXhwIjoxNzc1ODM0MjcwfQ.hSt3PIXQ_0hd2AwMKgXP-wa9_gR2R-qC2Bn-Ig6OBF8
+POST http://localhost:8080/api/cart/add
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQ0xJRU5UIiwic3ViIjoidXNlckB0ZXN0LmNvbSIsImlhdCI6MTc3NjYyMTQzOSwiZXhwIjoxNzc2NjI1MDM5fQ.uf3dn0WC9zPRCK0Lt5V6y459swPCnJa1rsxl8JrSG6E
+Content-Type: application/json
+
+{
+  "productId": 2,
+  "quantity": 1
+}
 
 ### put 2 to cart
 POST http://localhost:8080/api/cart/add/1?quantity=2
@@ -71,5 +77,5 @@ Content-Type: application/json
 
 {
   "email": "user@test.com",
-  "password": "123"
+  "password": "1234"
 }
