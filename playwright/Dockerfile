@@ -11,3 +11,6 @@ COPY . .
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 CMD ["npx", "playwright", "test"]
+
+# CMD ["sleep", "infinity"] 
+# - or this to docker-compose exec playwright npx playwright test

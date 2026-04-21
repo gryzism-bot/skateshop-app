@@ -51,7 +51,9 @@ npx playwright test --ui
 
 ## 🐳 Run with Docker
 
-or install Docker Desktop, go to root folder and docker-compose up --build
+or install Docker Desktop, go to root folder and docker-compose up -d --build
+
+docker-compose exec playwright npx playwright test or --ui to start tests or open UI mode
 
 ## 🔐 Authentication
 
@@ -102,3 +104,4 @@ fetch('http://localhost:8080/api/products', {
 .catch(err => console.error(err));
 
 http://localhost:8080/swagger-ui/index.html
+

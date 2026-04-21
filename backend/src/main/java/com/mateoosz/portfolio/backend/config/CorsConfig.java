@@ -15,8 +15,10 @@ public class CorsConfig {
                 registry.addMapping("/**")
                     .allowedOrigins("http://localhost:4200")
                     .allowedOrigins("${FRONTEND_URL}")
+                    .allowedOrigins("http://frontend")
                     .allowedMethods("*")
-                    .allowedHeaders("*");
+                    .allowedHeaders("*")
+                    .allowCredentials(true);;
             }
         };
     }
