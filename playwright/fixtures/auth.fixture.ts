@@ -8,9 +8,9 @@ export const test = base.extend<{}, WorkerFixtures>({
   getToken: [
     async ({}, use) => {
 
-      const request = await playwrightRequest.newContext({
-        baseURL: 'http://localhost:8080'
-      });
+      const baseURL = process.env.API_URL || 'http://localhost:8080';
+
+      const request = await playwrightRequest.newContext({baseURL});
 
       const cache = new Map<string, string>();
 
@@ -30,6 +30,7 @@ export const test = base.extend<{}, WorkerFixtures>({
         });
 
         const token = await res.text();
+        console.log('TOKEN:', token);
         cache.set(role, token);
 
         return token;

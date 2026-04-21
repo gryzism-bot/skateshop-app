@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.mateoosz.portfolio.backend.dto.CartRequestDTO;
 import com.mateoosz.portfolio.backend.dto.CartResponseDTO;
@@ -40,14 +41,30 @@ class CartServiceTest {
         productRepository = mock(ProductRepository.class);
         userRepository = mock(UserRepository.class);
 
-        service = new CartService(cartRepository, productRepository, userRepository);
+        service = new CartService(
+                cartRepository, 
+                productRepository, 
+                userRepository
+        );
+
+        User user = new User();
+        user.setEmail("test@test.com");
+        
+        when(userRepository.findByEmail("test@test.com"))
+                .thenReturn(Optional.of(user));
 
         // 🔥 Mock SecurityContext
-        SecurityContext context = mock(SecurityContext.class);
-        Authentication authentication = mock(Authentication.class);
+        Authentication auth = mock(Authentication.class);
 
-        when(authentication.getName()).thenReturn("test@test.com");
-        when(context.getAuthentication()).thenReturn(authentication);
+        UserDetails userDetails = mock(UserDetails.class);
+        when(userDetails.getUsername()).thenReturn("test@test.com");
+
+        when(auth.getPrincipal()).thenReturn(userDetails);
+        when(auth.getName()).thenReturn("test@test.com");
+        when(auth.isAuthenticated()).thenReturn(true);
+
+        SecurityContext context = mock(SecurityContext.class);
+        when(context.getAuthentication()).thenReturn(auth);
 
         SecurityContextHolder.setContext(context);
     }
@@ -61,7 +78,7 @@ class CartServiceTest {
         when(userRepository.findByEmail("test@test.com"))
                 .thenReturn(Optional.of(user));
 
-        when(cartRepository.findByUser(user))
+        when(cartRepository.findByUser((any(User.class))))
                 .thenReturn(Optional.empty());
 
         when(cartRepository.save(any(Cart.class)))
@@ -97,7 +114,7 @@ class CartServiceTest {
         when(productRepository.findById(1L))
                 .thenReturn(Optional.of(product));
 
-        when(cartRepository.findByUser(user))
+        when(cartRepository.findByUser((any(User.class))))
                 .thenReturn(Optional.of(cart));
 
         when(cartRepository.save(any(Cart.class)))
@@ -136,7 +153,7 @@ class CartServiceTest {
         when(productRepository.findById(1L))
                 .thenReturn(Optional.of(product));
 
-        when(cartRepository.findByUser(user))
+        when(cartRepository.findByUser((any(User.class))))
                 .thenReturn(Optional.of(cart));
 
         when(cartRepository.save(any(Cart.class)))
@@ -201,7 +218,7 @@ class CartServiceTest {
         when(userRepository.findByEmail("test@test.com"))
                 .thenReturn(Optional.of(user));
 
-        when(cartRepository.findByUser(user))
+        when(cartRepository.findByUser((any(User.class))))
                 .thenReturn(Optional.of(cart));
 
         when(cartRepository.save(any(Cart.class)))

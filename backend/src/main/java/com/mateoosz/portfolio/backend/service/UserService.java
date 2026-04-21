@@ -21,30 +21,22 @@ public class UserService {
     // 🧾 Register new user
     public User register(User user) {
 
-        try {
-            
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
-            throw new RuntimeException("Email is required");
-        }
-
-        if (user.getPassword() == null || user.getPassword().isBlank()) {
-            throw new RuntimeException("Password is required");
-        }
-
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("User with this email already exists");
-        }
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Registration failed: " + e.getMessage());
-        }
-        
-        return userRepository.save(user);
-
+    if (user.getEmail() == null || user.getEmail().isBlank()) {
+        throw new RuntimeException("Email is required");
     }
+
+    if (user.getPassword() == null || user.getPassword().isBlank()) {
+        throw new RuntimeException("Password is required");
+    }
+
+    if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+        throw new RuntimeException("User with this email already exists");
+    }
+
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+    return userRepository.save(user);
+}
 
     // 🔍 Find user (used by services)
     public User findByEmail(String email) {

@@ -26,15 +26,26 @@ public class AuthService {
 
     public String login(String email, String password) {
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+    System.out.println("LOGIN ATTEMPT: " + email);
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new BadCredentialsException("Invalid password");
-        }
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException("User not found"));
 
-        return jwtService.generateToken(user);
+    System.out.println("USER FOUND: " + user.getEmail());
+
+    if (!passwordEncoder.matches(password, user.getPassword())) {
+        System.out.println("PASSWORD MISMATCH");
+        throw new BadCredentialsException("Invalid password");
     }
+
+    System.out.println("PASSWORD OK");
+
+    String token = jwtService.generateToken(user);
+
+    System.out.println("TOKEN GENERATED");
+
+    return token;
+}
 
     public User register(String email, String password) {
 

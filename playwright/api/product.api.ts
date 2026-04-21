@@ -9,7 +9,8 @@ export class ProductAPI {
   async createProduct(data: any) {
     return this.request.post('/api/products', {
       headers: {
-        Authorization: `Bearer ${this.token}`
+        Authorization: `Bearer ${this.token}`,
+        'Content-Type': 'application/json'
       },
       data
     });

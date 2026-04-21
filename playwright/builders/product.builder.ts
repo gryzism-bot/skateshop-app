@@ -7,7 +7,7 @@ export class ProductBuilder {
   private stock = 10;
   private category: Category = 'SKATES';
   private type: ProductType = 'FREESKATE';
-  private imageUrl = 'https://example.com/image.jpg';
+  private imageUrl = 'https://cdn.bladeville.pl/media/catalog/product/i/m/img_4447.jpg';
 
   withName(name: string) {
     this.name = name;

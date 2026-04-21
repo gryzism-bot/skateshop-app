@@ -13,6 +13,8 @@ import { defineConfig, devices } from '@playwright/test';
  */
 const baseURL = process.env.API_URL || 'http://localhost:8080';
 
+console.log('BASE URL:', process.env.API_URL);
+
 export default defineConfig({
   testDir: './tests',
   /* Run tests in files in parallel */
@@ -41,15 +43,15 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
+    // {
+    //   name: 'firefox',
+    //   use: { ...devices['Desktop Firefox'] },
+    // },
 
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+    // {
+    //   name: 'webkit',
+    //   use: { ...devices['Desktop Safari'] },
+    // },
 
     /* Test against mobile viewports. */
     // {

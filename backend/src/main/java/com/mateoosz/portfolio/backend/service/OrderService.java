@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.mateoosz.portfolio.backend.model.Cart;
+import com.mateoosz.portfolio.backend.model.CartItem;
 import com.mateoosz.portfolio.backend.model.Order;
 import com.mateoosz.portfolio.backend.model.OrderItem;
 import com.mateoosz.portfolio.backend.model.User;
@@ -28,61 +29,85 @@ public class OrderService {
         this.userRepository = userRepository;
     }
 
-    // 🧾 Create order from current user's cart
     public Order createOrder() {
 
         String email = SecurityUtils.getCurrentUserEmail();
 
-        User user = userRepository.findByEmail(email)
+        User user = getUser(email);
+        Cart cart = getCart(user);
+
+        validateCart(cart);
+
+        Order order = buildOrder(user, cart);
+
+        Order savedOrder = orderRepository.save(order);
+
+        clearCart(cart);
+
+        return savedOrder;
+
+    }
+
+    private User getUser(String email) {
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 
-        Cart cart = cartRepository.findByUser(user)
+    private Cart getCart(User user) {
+        return cartRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
+    }
 
-        if (cart.getItems() == null || cart.getItems().isEmpty()) {
+    private void validateCart(Cart cart) {
+        if (cart.getItems().isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
+    }
 
-        // 🔄 Convert cart items → order items
+    private Order buildOrder(User user, Cart cart) {
+
         Order order = new Order();
         order.setUser(user);
 
-        List<OrderItem> orderItems = cart.getItems().stream().map(cartItem -> {
+        List<OrderItem> items = cart.getItems().stream()
+                .map(ci -> mapToOrderItem(ci, order))
+                .toList();
 
-            if (cartItem.getProduct() == null) {
-                throw new RuntimeException("Invalid cart item: product missing");
-            }
+        order.setItems(items);
+        order.setTotalPrice(calculateTotal(items));
 
-            OrderItem item = new OrderItem();
-            item.setProduct(cartItem.getProduct());
-            item.setQuantity(cartItem.getQuantity());
-            item.setPrice(cartItem.getProduct().getPrice());
-            item.setOrder(order);
+        return order;
+    }
 
-            return item;
+    private OrderItem mapToOrderItem(CartItem cartItem, Order order) {
 
-        }).toList();
+        if (cartItem.getProduct() == null) {
+            throw new RuntimeException("Invalid cart item: product missing");
+        }
 
-        order.setItems(orderItems);
+        OrderItem item = new OrderItem();
+        item.setProduct(cartItem.getProduct());
+        item.setQuantity(cartItem.getQuantity());
+        item.setPrice(cartItem.getProduct().getPrice());
+        item.setOrder(order);
 
-        // 💰 Calculate total
-        double totalPrice = orderItems.stream()
-                .mapToDouble(i -> i.getPrice() * i.getQuantity())
-                .sum();
+        return item;
+    }
 
-        if (totalPrice <= 0) {
+    private double calculateTotal(List<OrderItem> items) {
+        double total = items.stream()
+            .mapToDouble(i -> i.getPrice() * i.getQuantity())
+            .sum();
+
+        if (total <= 0) {
             throw new RuntimeException("Invalid order total");
         }
 
-        order.setTotalPrice(totalPrice);
+        return total;
+    }
 
-        // 💾 Save order
-        Order savedOrder = orderRepository.save(order);
-
-        // 🧹 Clear cart AFTER successful save
+    private void clearCart(Cart cart) {
         cart.getItems().clear();
         cartRepository.save(cart);
-
-        return savedOrder;
     }
 }
