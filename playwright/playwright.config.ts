@@ -11,12 +11,21 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-const baseURL = process.env.API_URL || 'http://localhost:8080';
+const isDocker = process.env.DOCKER === 'true';
+
+const backendURL = isDocker
+  ? 'http://backend:8080'
+  : 'http://localhost:8080';
+
+const frontendURL = isDocker
+  ? 'http://frontend:80'
+  : 'http://localhost:4200';
 
 console.log('BASE URL:', process.env.API_URL);
 
 export default defineConfig({
   testDir: './tests',
+  timeout: 30_000,
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -30,7 +39,6 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
-    baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -39,8 +47,19 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'api',
+      testDir: './tests/api',
+      use: {
+        baseURL: backendURL,
+      },
+    },
+    {
+      name: 'ui',
+      testDir: './tests/ui',
+      use: {
+        baseURL: frontendURL,
+        headless: true,
+      },
     },
 
     // {

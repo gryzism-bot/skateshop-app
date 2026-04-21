@@ -30,7 +30,6 @@ export const test = base.extend<{}, WorkerFixtures>({
         });
 
         const token = await res.text();
-        console.log('TOKEN:', token);
         cache.set(role, token);
 
         return token;

@@ -29,7 +29,10 @@ services:
     build: ./playwright
     environment:
       - API_URL=http://backend:8080/api
+      - DOCKER=true
     depends_on:
       backend:
+        condition: service_healthy
+      frontend:
         condition: service_healthy
     command: ["npx", "playwright", "test"]

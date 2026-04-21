@@ -2,7 +2,7 @@
 
 A simple e-commerce back and frontend for a skate shop built with Spring Boot and Angular
 
-currently: tests in test.http, understanding and adding unit tests, Playwright repo to be implemented after userless cart and order
+currently: tests in test.http, understanding and adding unit tests, Playwright api tests, UI to be implemented after userless cart and creating order on UI
 
 https://youtube.com/shorts/ZAp0CHNlNBI?feature=share
 

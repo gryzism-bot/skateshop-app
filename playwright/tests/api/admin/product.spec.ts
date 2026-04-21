@@ -1,6 +1,6 @@
-import { test} from '../../fixtures/app.fixture';
+import { test } from '../../../fixtures/app.fixture';
 import { expect } from '@playwright/test';
-import { ProductBuilder } from '../../builders/product.builder';
+import { ProductBuilder } from '../../../builders/product.builder';
 
 test('admin can create product', async ({ getProductApi }) => {
 
@@ -10,7 +10,7 @@ test('admin can create product', async ({ getProductApi }) => {
     .withName('Admin Skate Playwright')
     .withPrice(299)
     .withStock(5)
-    .withImage('https://cdn.bladeville.pl/media/catalog/product/9/0/908435-40847_ps_next_core_black_90_2023_view01.jpg')
+    .withImage('https://cdn.bladeville.pl/media/catalog/product/i/m/img_4447.jpg')
     .build();
 
   const response = await api.createProduct(product);

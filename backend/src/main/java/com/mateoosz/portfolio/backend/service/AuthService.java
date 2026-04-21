@@ -26,8 +26,6 @@ public class AuthService {
 
     public String login(String email, String password) {
 
-    System.out.println("LOGIN ATTEMPT: " + email);
-
     User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new NotFoundException("User not found"));
 
@@ -38,11 +36,7 @@ public class AuthService {
         throw new BadCredentialsException("Invalid password");
     }
 
-    System.out.println("PASSWORD OK");
-
     String token = jwtService.generateToken(user);
-
-    System.out.println("TOKEN GENERATED");
 
     return token;
 }
