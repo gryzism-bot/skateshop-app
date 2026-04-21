@@ -1,6 +1,6 @@
-import { test} from '../../fixtures/app.fixture';
+import { test} from '../../../fixtures/app.fixture';
 import { expect } from '@playwright/test';
-import { ProductBuilder } from '../../builders/product.builder';
+import { ProductBuilder } from '../../../builders/product.builder';
 
 test('user can add product to cart', async ({
   getProductApi,
