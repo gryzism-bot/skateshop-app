@@ -2,7 +2,7 @@
 
 A simple e-commerce back and frontend for a skate shop built with Spring Boot and Angular
 
-currently: tests in test.http, understanding and adding unit tests, Playwright api tests, UI to be implemented after userless cart and creating order on UI
+currently: tests in test.http, understanding and adding unit tests, Playwright api tests and ui init test
 
 https://youtube.com/shorts/ZAp0CHNlNBI?feature=share
 
@@ -44,9 +44,14 @@ cd frontend
 npm install
 npm start
 
+third terminal:
+cd playwright
+npm install
+npx playwright test --ui
+
 ## 🐳 Run with Docker
 
-should work with docker compose up in source folder, it has backend alias instead of localhost
+or install Docker Desktop, go to root folder and docker-compose up --build
 
 ## 🔐 Authentication
 
