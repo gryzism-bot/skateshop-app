@@ -28,7 +28,13 @@ inits with 4 products, user and admin
 * Angular
 * Docker
 
-## ▶️ Run locally
+## 🐳 Run with Docker
+
+install Docker Desktop, go to root folder and docker-compose up -d --build
+
+docker-compose exec playwright npx playwright test or --ui to start tests or open UI mode
+
+## ▶️ Run locally (doesn't work now, not sure why, 403 from frontend to backend)
 
 install git
 open a folder with command line
@@ -48,12 +54,6 @@ third terminal:
 cd playwright
 npm install
 npx playwright test --ui
-
-## 🐳 Run with Docker
-
-or install Docker Desktop, go to root folder and docker-compose up -d --build
-
-docker-compose exec playwright npx playwright test or --ui to start tests or open UI mode
 
 ## 🔐 Authentication
 
