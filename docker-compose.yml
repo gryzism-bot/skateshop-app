@@ -26,8 +26,9 @@ services:
   playwright:
     build: ./playwright
     environment:
-      - API_URL=http://backend:8080/api
-      - DOCKER=true
+      - API_URL: http://backend:8080/api
+      - UI_URL: http://frontend:4200
+      - DOCKER: true
       - PLAYWRIGHT_UI_HOST=0.0.0.0
     ports:
     - "9323:9323"

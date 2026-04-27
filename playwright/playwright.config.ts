@@ -11,15 +11,11 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-const isDocker = process.env.DOCKER === 'true';
+const backendURL =
+  process.env.API_URL || 'http://localhost:8080/api';
 
-const backendURL = isDocker
-  ? 'http://backend:8080'
-  : 'http://localhost:8080';
-
-const frontendURL = isDocker
-  ? 'http://frontend:80'
-  : 'http://localhost:4200';
+const frontendURL =
+  process.env.UI_URL || 'http://localhost:4200';
 
 console.log('BASE URL:', process.env.API_URL);
 
