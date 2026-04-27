@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test('client can login and add product to cart', async ({ page }) => {
+
+  //doesn't work until fix the problem with routing working in Docker but not in development environment, can't start Playwright in UI mode
   await page.goto('/');
 
   await page.click('text=Login');

@@ -34,7 +34,9 @@ install Docker Desktop, go to root folder and docker-compose up -d --build
 
 docker-compose exec playwright npx playwright test or --ui to start tests or open UI mode
 
-## ▶️ Run locally (doesn't work now, not sure why, 403 from frontend to backend)
+## ▶️ Run locally 
+
+* (doesn't work now, not sure why yet, 403 from frontend to backend and frontend calls itself with products)
 
 install git
 open a folder with command line
