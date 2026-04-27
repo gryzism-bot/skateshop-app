@@ -32,11 +32,11 @@ inits with 4 products, user and admin
 
 install Docker Desktop, go to root folder and docker-compose up -d --build
 
-docker-compose exec playwright npx playwright test or --ui to start tests or open UI mode
+localhost:4200
+
+docker-compose exec playwright npx playwright test
 
 ## ▶️ Run locally 
-
-* (doesn't work now, not sure why yet, 403 from frontend to backend and frontend calls itself with products)
 
 install git
 open a folder with command line
@@ -46,11 +46,13 @@ install node
 cd backend 
 mvn clean install
 ./mvnw spring-boot:run
+localhost:8080
 
 second terminal:
 cd frontend 
 npm install
 npm start
+localhost:4200
 
 third terminal:
 cd playwright
@@ -84,7 +86,7 @@ Authorization: Bearer <token>
 * CLIENT → shopping
 * ADMIN → product management
 
-## test from DevTools Console:
+## test api from DevTools Console after UI login:
 
 fetch('http://localhost:8080/api/products', {
   method: 'POST',
