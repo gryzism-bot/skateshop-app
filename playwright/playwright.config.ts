@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-import 'dotenv/config';
+import dotenv from 'dotenv';
 
 /**
  * Read environment variables from file.
@@ -12,13 +12,14 @@ import 'dotenv/config';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-const backendURL =
-  process.env.API_URL || 'http://localhost:8080/api';
+const envFile = process.env.DOCKER
+  ? '.env.docker'
+  : '.env';
 
-const frontendURL =
-  process.env.UI_URL || 'http://localhost:4200';
+dotenv.config({ path: envFile });
 
-console.log('BASE URL:', process.env.API_URL);
+console.log('API URL:', process.env.API_URL);
+console.log('UI URL:', process.env.UI_URL);
 
 export default defineConfig({
   testDir: './tests',
@@ -47,14 +48,14 @@ export default defineConfig({
       name: 'api',
       testDir: './tests/api',
       use: {
-        baseURL: backendURL,
+        baseURL: process.env.API_URL,
       },
     },
     {
       name: 'ui',
       testDir: './tests/ui',
       use: {
-        baseURL: frontendURL,
+        baseURL: process.env.UI_URL,
         headless: true,
       },
     },
