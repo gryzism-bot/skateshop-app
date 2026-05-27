@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
       next: (products: Product[]) => {
         console.log("PRODUCTS:", products); 
         this.products = products;
-        this.changeDetectorRef.detectChanges(); // todo: workaround
+        // this.changeDetectorRef.detectChanges(); // todo: workaround // when commented out products don't load until logout or login button is clicked
       },
       error: (err) => {
         console.error("Products error:", err); 
@@ -52,7 +52,7 @@ export class AppComponent implements OnInit {
       next: (cart: CartResponseDTO) => {
         console.log("CART:", cart); 
         this.cart = cart;
-        this.changeDetectorRef.detectChanges();
+        // this.changeDetectorRef.detectChanges();
       },
       error: (err) => {
         console.error("Cart error:", err); 

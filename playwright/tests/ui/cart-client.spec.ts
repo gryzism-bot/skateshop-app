@@ -12,7 +12,7 @@ test('client can login and add product to cart', async ({ page }) => {
 
   await page.locator('div').filter({ hasText: 'Freeskate 1500 PLN Add to' }).getByRole('button').click();
 
-  await expect(page.locator('/html/body/app-root/div[7]')).toBeVisible(); // Wait for the cart to update
+  await expect(page.locator('div.cart')).toBeVisible(); // Wait for the cart to update
 
   // await expect(page.locator('.cart-item')).toHaveCount(1);
 });
