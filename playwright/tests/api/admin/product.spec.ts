@@ -86,10 +86,26 @@ test.describe('product API', () => {
     expect(body.name.match(randomSuffixPattern)?.[0]).toBe(suffix);
   });
 
-  test('admin cannot create product with category and type conflict', async ({ testContext }) => {
-    await expectProductRejected(testContext, productWithCategoryAndType('SKATES', 'WHEELS'), 400);
-    await expectProductRejected(testContext, productWithCategoryAndType('ACCESSORIES', 'FREESKATE'), 400);
-  });
+  const invalidCreateProductCases = [
+    {
+      caseName: 'missing name',
+      product: () => new ProductBuilder().withName('').build()
+    },
+    {
+      caseName: 'skates category with wheels type',
+      product: () => productWithCategoryAndType('SKATES', 'WHEELS')
+    },
+    {
+      caseName: 'accessories category with freeskate type',
+      product: () => productWithCategoryAndType('ACCESSORIES', 'FREESKATE')
+    }
+  ];
+
+  for (const invalidProductCase of invalidCreateProductCases) {
+    test(`admin cannot create product with ${invalidProductCase.caseName}`, async ({ testContext }) => {
+      await expectProductRejected(testContext, invalidProductCase.product(), 400);
+    });
+  }
 
   test('admin cannot create product with unknown category', async ({ testContext }) => {
     const response = await testContext.api.admin.product.createProduct({

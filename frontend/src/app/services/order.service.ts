@@ -33,6 +33,17 @@ export interface Order {
   createdOn?: string;
 }
 
+export interface AdminOrder {
+  id: number;
+  userEmail: string;
+  contactEmail: string;
+  deliveryAddress?: string;
+  paczkomatCode?: string;
+  totalPrice: number;
+  status: string;
+  createdOn?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -48,5 +59,13 @@ export class OrderService {
 
   pay(orderId: number): Observable<Order> {
     return this.http.post<Order>(`${this.apiUrl}/${orderId}/pay`, {});
+  }
+
+  getAdminOrders(): Observable<AdminOrder[]> {
+    return this.http.get<AdminOrder[]>(`${this.apiUrl}/admin`);
+  }
+
+  markAsSent(orderId: number): Observable<AdminOrder> {
+    return this.http.post<AdminOrder>(`${this.apiUrl}/${orderId}/sent`, {});
   }
 }

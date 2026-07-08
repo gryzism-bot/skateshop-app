@@ -46,14 +46,14 @@ public class UserService {
 
     public UserProfileResponse getCurrentUserProfile() {
         User user = findByEmail(SecurityUtils.getCurrentUserEmail());
-        return new UserProfileResponse(user.getEmail(), user.getAddress());
+        return new UserProfileResponse(user.getEmail(), user.getAddress(), user.getRole());
     }
 
     public UserProfileResponse updateCurrentUserAddress(UserAddressRequest request) {
         User user = findByEmail(SecurityUtils.getCurrentUserEmail());
         user.setAddress(request.getAddress());
         User savedUser = userRepository.save(user);
-        return new UserProfileResponse(savedUser.getEmail(), savedUser.getAddress());
+        return new UserProfileResponse(savedUser.getEmail(), savedUser.getAddress(), savedUser.getRole());
     }
 
     public User validateLogin(String email, String rawPassword) {

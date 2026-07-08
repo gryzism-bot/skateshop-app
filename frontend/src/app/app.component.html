@@ -157,6 +157,13 @@
           Your cart is empty
         </p>
       </section>
+
+      <section *ngIf="userRole() === 'ADMIN'" class="admin-entry-panel">
+        <button data-testid="admin-panel-button"
+                (click)="openAdminPanel()">
+          ADMIN PANEL
+        </button>
+      </section>
     </aside>
   </main>
 
@@ -331,6 +338,66 @@
           Place order
         </button>
       </footer>
+    </section>
+  </div>
+
+  <div *ngIf="adminPanelOpen()"
+       class="modal-backdrop"
+       data-testid="admin-panel-modal"
+       role="dialog"
+       aria-modal="true"
+       aria-label="Admin panel">
+    <section class="checkout-modal">
+      <header class="modal-header">
+        <div>
+          <p>Admin panel</p>
+          <h2>Orders</h2>
+        </div>
+        <button class="icon-button"
+                data-testid="close-admin-panel-button"
+                aria-label="Close admin panel"
+                (click)="closeAdminPanel()">
+          x
+        </button>
+      </header>
+
+      <p *ngIf="adminMessage()"
+         class="checkout-message"
+         data-testid="admin-panel-message">
+        {{ adminMessage() }}
+      </p>
+
+      <p *ngIf="adminError()"
+         class="checkout-error"
+         data-testid="admin-panel-error">
+        {{ adminError() }}
+      </p>
+
+      <div class="admin-order-list" data-testid="admin-order-list">
+        <article *ngFor="let order of adminOrders()"
+                 class="admin-order"
+                 data-testid="admin-order">
+          <div>
+            <p>Order {{ order.id }}</p>
+            <h3 data-testid="admin-order-status">{{ order.status }}</h3>
+            <p data-testid="admin-order-email">{{ order.userEmail }}</p>
+            <p data-testid="admin-order-address">{{ order.deliveryAddress || order.paczkomatCode }}</p>
+            <strong>{{ order.totalPrice }} PLN</strong>
+          </div>
+
+          <button *ngIf="order.status === 'PAID'"
+                  data-testid="mark-order-sent-button"
+                  (click)="markOrderAsSent(order.id)">
+            MARK AS SENT
+          </button>
+        </article>
+      </div>
+
+      <p *ngIf="!adminOrders().length"
+         class="empty-products"
+         data-testid="empty-admin-orders">
+        No orders found
+      </p>
     </section>
   </div>
 </div>

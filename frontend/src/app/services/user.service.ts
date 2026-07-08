@@ -6,6 +6,7 @@ import { environment } from '../../environments/environment';
 export interface UserProfile {
   email: string;
   address?: string;
+  role: 'ADMIN' | 'CLIENT';
 }
 
 @Injectable({

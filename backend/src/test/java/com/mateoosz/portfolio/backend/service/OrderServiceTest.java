@@ -255,6 +255,50 @@ class OrderServiceTest {
         verify(orderRepository).save(order);
     }
 
+    @Test
+    void shouldReturnOrdersForAdmin() {
+        User user = user();
+        Order paidOrder = order(user, 10L, OrderStatus.PAID);
+        Order sentOrder = order(user, 11L, OrderStatus.SENT);
+
+        when(orderRepository.findAll(any(org.springframework.data.domain.Sort.class)))
+                .thenReturn(List.of(paidOrder, sentOrder));
+
+        var orders = orderService.getOrdersForAdmin();
+
+        assertThat(orders).hasSize(2);
+        assertThat(orders.get(0).getId()).isEqualTo(10L);
+        assertThat(orders.get(0).getUserEmail()).isEqualTo("test@test.com");
+        assertThat(orders.get(0).getStatus()).isEqualTo(OrderStatus.PAID);
+        assertThat(orders.get(1).getStatus()).isEqualTo(OrderStatus.SENT);
+    }
+
+    @Test
+    void shouldMarkPaidOrderAsSent() {
+        User user = user();
+        Order order = order(user, 10L, OrderStatus.PAID);
+
+        when(orderRepository.findById(10L)).thenReturn(Optional.of(order));
+        when(orderRepository.save(order)).thenReturn(order);
+
+        var sentOrder = orderService.markOrderAsSent(10L);
+
+        assertThat(sentOrder.getStatus()).isEqualTo(OrderStatus.SENT);
+        verify(orderRepository).save(order);
+    }
+
+    @Test
+    void shouldRejectMarkingNonPaidOrderAsSent() {
+        User user = user();
+        Order order = order(user, 10L, OrderStatus.NEW);
+
+        when(orderRepository.findById(10L)).thenReturn(Optional.of(order));
+
+        assertThatThrownBy(() -> orderService.markOrderAsSent(10L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Only paid orders can be sent");
+    }
+
     private void mockCurrentUserAndCart(User user, Cart cart) {
         when(userRepository.findByEmail("test@test.com"))
                 .thenReturn(Optional.of(user));
@@ -267,6 +311,17 @@ class OrderServiceTest {
         User user = new User();
         user.setEmail("test@test.com");
         return user;
+    }
+
+    private Order order(User user, Long id, OrderStatus status) {
+        Order order = new Order();
+        order.setId(id);
+        order.setUser(user);
+        order.setContactEmail("test@test.com");
+        order.setDeliveryAddress("Longboard Street 7, Warsaw");
+        order.setTotalPrice(100);
+        order.setStatus(status);
+        return order;
     }
 
     private Product product(double price) {

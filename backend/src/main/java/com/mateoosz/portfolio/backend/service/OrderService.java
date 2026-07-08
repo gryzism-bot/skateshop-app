@@ -2,8 +2,10 @@ package com.mateoosz.portfolio.backend.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.mateoosz.portfolio.backend.dto.AdminOrderResponse;
 import com.mateoosz.portfolio.backend.dto.CheckoutRequest;
 import com.mateoosz.portfolio.backend.exception.NotFoundException;
 import com.mateoosz.portfolio.backend.model.Cart;
@@ -73,6 +75,37 @@ public class OrderService {
 
         order.setStatus(OrderStatus.PAID);
         return orderRepository.save(order);
+    }
+
+    public List<AdminOrderResponse> getOrdersForAdmin() {
+        return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createdOn")).stream()
+                .map(this::mapToAdminOrderResponse)
+                .toList();
+    }
+
+    public AdminOrderResponse markOrderAsSent(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Order not found"));
+
+        if (order.getStatus() != OrderStatus.PAID) {
+            throw new IllegalArgumentException("Only paid orders can be sent");
+        }
+
+        order.setStatus(OrderStatus.SENT);
+        return mapToAdminOrderResponse(orderRepository.save(order));
+    }
+
+    private AdminOrderResponse mapToAdminOrderResponse(Order order) {
+        return new AdminOrderResponse(
+                order.getId(),
+                order.getUser().getEmail(),
+                order.getContactEmail(),
+                order.getDeliveryAddress(),
+                order.getPaczkomatCode(),
+                order.getTotalPrice(),
+                order.getStatus(),
+                order.getCreatedOn()
+        );
     }
 
     private User getUser(String email) {

@@ -179,7 +179,8 @@ button:hover {
 }
 
 .login-panel,
-.cart-panel {
+.cart-panel,
+.admin-entry-panel {
   padding: 1rem;
   border: 1px solid #d9d5ca;
   border-radius: 8px;
@@ -272,6 +273,15 @@ button:hover {
 
 .checkout-actions button {
   width: 100%;
+}
+
+.admin-entry-panel button {
+  width: 100%;
+  background: #3d4663;
+}
+
+.admin-entry-panel button:hover {
+  background: #2d344d;
 }
 
 button:disabled {
@@ -482,6 +492,32 @@ button:disabled:hover {
   gap: 0.65rem;
 }
 
+.admin-order-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.admin-order {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem;
+  border: 1px solid #e1ddd4;
+  border-radius: 6px;
+  background: #fbfaf7;
+}
+
+.admin-order p,
+.admin-order h3 {
+  margin: 0 0 0.25rem;
+}
+
+.admin-order p {
+  color: #64746e;
+  font-size: 0.82rem;
+}
+
 .modal-actions {
   justify-content: flex-end;
   margin-top: 1rem;
@@ -520,6 +556,10 @@ button:disabled:hover {
 
   .modal-actions {
     display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-order {
     grid-template-columns: 1fr;
   }
 }

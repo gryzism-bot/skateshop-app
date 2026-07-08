@@ -5,7 +5,7 @@ import { switchMap } from 'rxjs/operators';
 
 import { AuthService } from './services/auth.service';
 import { CartResponseDTO, CartService } from './services/cart.service';
-import { CheckoutRequest, Order, OrderService } from './services/order.service';
+import { AdminOrder, CheckoutRequest, Order, OrderService } from './services/order.service';
 import { ProductService } from './services/product.service';
 import { UserService } from './services/user.service';
 
@@ -37,6 +37,11 @@ export class AppComponent implements OnInit {
   checkoutOpen = signal(false);
   checkoutStep = signal(1);
   currentOrder = signal<Order | null>(null);
+  userRole = signal<'ADMIN' | 'CLIENT' | null>(null);
+  adminPanelOpen = signal(false);
+  adminOrders = signal<AdminOrder[]>([]);
+  adminMessage = signal('');
+  adminError = signal('');
   checkoutContactEmail = '';
   checkoutPromoCode = '';
   checkoutDeliveryMethod: 'ADDRESS' | 'PACZKOMAT' = 'ADDRESS';
@@ -64,6 +69,7 @@ export class AppComponent implements OnInit {
     this.refreshGuestCartState();
 
     if (this.isLoggedIn()) {
+      this.loadUserProfile();
       this.loadCart();
     } else {
       this.cart.set(this.cartService.getGuestCart());
@@ -141,6 +147,7 @@ export class AppComponent implements OnInit {
         this.accountMessage.set('You are logged in.');
         this.checkoutContactEmail = email;
         this.refreshGuestCartState();
+        this.loadUserProfile();
         this.loadCart();
         console.log('Logged in!');
       },
@@ -159,6 +166,8 @@ export class AppComponent implements OnInit {
     this.cart.set(this.cartService.getGuestCart());
     this.accountMessage.set('You are browsing as a guest.');
     this.accountError.set('');
+    this.userRole.set(null);
+    this.closeAdminPanel();
     this.closeCheckout();
     this.refreshGuestCartState();
     console.log('Logged out');
@@ -319,6 +328,59 @@ export class AppComponent implements OnInit {
     return this.checkoutContactEmail.trim().length > 0
       && hasDelivery
       && this.checkoutPaymentMethod.length > 0;
+  }
+
+  openAdminPanel(): void {
+    this.adminMessage.set('');
+    this.adminError.set('');
+    this.adminPanelOpen.set(true);
+    this.loadAdminOrders();
+  }
+
+  closeAdminPanel(): void {
+    this.adminPanelOpen.set(false);
+    this.adminOrders.set([]);
+  }
+
+  markOrderAsSent(orderId: number): void {
+    this.adminMessage.set('');
+    this.adminError.set('');
+
+    this.orderService.markAsSent(orderId).subscribe({
+      next: (updatedOrder) => {
+        this.adminOrders.update(orders => orders.map(order =>
+          order.id === updatedOrder.id ? updatedOrder : order
+        ));
+        this.adminMessage.set(`Order ${updatedOrder.id} marked as ${updatedOrder.status}.`);
+      },
+      error: (err) => {
+        this.adminError.set('Could not mark order as sent.');
+        console.error('Admin order update error:', err);
+      }
+    });
+  }
+
+  private loadAdminOrders(): void {
+    this.orderService.getAdminOrders().subscribe({
+      next: (orders) => {
+        this.adminOrders.set(orders);
+      },
+      error: (err) => {
+        this.adminError.set('Could not load admin orders.');
+        console.error('Admin orders error:', err);
+      }
+    });
+  }
+
+  private loadUserProfile(): void {
+    this.userService.getProfile().subscribe({
+      next: (profile) => {
+        this.userRole.set(profile.role);
+      },
+      error: (err) => {
+        console.error('Profile error:', err);
+      }
+    });
   }
 
   private refreshGuestCartState(): void {

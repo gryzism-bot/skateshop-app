@@ -33,6 +33,18 @@ export class OrderAPI {
     });
   }
 
+  async getAdminOrders() {
+    return this.request.get('/api/orders/admin', {
+      headers: this.authHeaders()
+    });
+  }
+
+  async markAsSent(orderId: number) {
+    return this.request.post(`/api/orders/${orderId}/sent`, {
+      headers: this.authHeaders()
+    });
+  }
+
   private authHeaders() {
     return {
       Authorization: `Bearer ${this.token}`

@@ -1,11 +1,12 @@
 import { test as base, request as playwrightRequest } from '@playwright/test';
 
 type WorkerFixtures = {
-  getToken: (role: 'admin' | 'client') => Promise<string>;
+  getTokenWorkerFixture: (role: 'admin' | 'client') => Promise<string>;
 };
 
 export const test = base.extend<{}, WorkerFixtures>({
-  getToken: [
+  // Worker-scoped: cached JWT lookup for seeded users shared by tests in one worker.
+  getTokenWorkerFixture: [
     async ({}, use) => {
 
       const baseURL = process.env.API_URL || 'http://localhost:8080';
@@ -14,7 +15,7 @@ export const test = base.extend<{}, WorkerFixtures>({
 
       const cache = new Map<string, string>();
 
-      const getToken = async (role: 'admin' | 'client') => {
+      const getTokenWorkerFixture = async (role: 'admin' | 'client') => {
 
         if (cache.has(role)) {
           return cache.get(role)!;
@@ -35,7 +36,7 @@ export const test = base.extend<{}, WorkerFixtures>({
         return token;
       };
 
-      await use(getToken);
+      await use(getTokenWorkerFixture);
 
       await request.dispose();
     },

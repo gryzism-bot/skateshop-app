@@ -28,9 +28,10 @@ type AppFixtures = {
 };
 
 export const test = base.extend<AppFixtures>({
-  testContext: async ({ request, getToken }, use) => {
-    const adminToken = await getToken('admin');
-    const clientToken = await getToken('client');
+  // Test-scoped: business API clients composed around Playwright's request fixture.
+  testContext: async ({ request, getTokenWorkerFixture }, use) => {
+    const adminToken = await getTokenWorkerFixture('admin');
+    const clientToken = await getTokenWorkerFixture('client');
 
     const adminProductApi = new ProductAPI(request, adminToken);
     const clientProductApi = new ProductAPI(request, clientToken);
@@ -51,18 +52,21 @@ export const test = base.extend<AppFixtures>({
     });
   },
 
-  cartApi: async ({ request, getToken }, use) => {
-    const token = await getToken('client');
+  // Test-scoped: direct cart API client for specs/dsl that only need cart behavior.
+  cartApi: async ({ request, getTokenWorkerFixture }, use) => {
+    const token = await getTokenWorkerFixture('client');
     await use(new CartAPI(request, token));
   },
 
+  // Test-scoped: cart workflow DSL built on the cart API client.
   cartDsl: async ({ cartApi }, use) => {
     await use(new CartDsl(cartApi));
   },
 
-  getProductApi: async ({ request, getToken }, use) => {
+  // Test-scoped: factory for product API clients with a chosen seeded role.
+  getProductApi: async ({ request, getTokenWorkerFixture }, use) => {
     await use(async (role) => {
-      const token = await getToken(role);
+      const token = await getTokenWorkerFixture(role);
       return new ProductAPI(request, token);
     });
   }
