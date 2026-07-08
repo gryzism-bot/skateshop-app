@@ -1,16 +1,23 @@
-export type ProductType = 'FREESKATE' | 'CRASHPADS';
-export type Category = 'SKATES' | 'ACCESSORIES';
+export type ProductType = 'FREESKATE' | 'SPEEDSKATE' | 'LINERS' | 'WHEELS' | 'CRASHPADS';
+export type ProductCategory = 'SKATES' | 'ACCESSORIES';
 
 export class ProductBuilder {
   private name = 'Test Product';
+  private sku = `TEST-SKU-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
   private price = 100;
   private stock = 10;
-  private category: Category = 'SKATES';
+  private category: ProductCategory = 'SKATES';
   private type: ProductType = 'FREESKATE';
   private imageUrl = 'https://cdn.bladeville.pl/media/catalog/product/i/m/img_4447.jpg';
+  private active = true;
 
   withName(name: string) {
     this.name = name;
+    return this;
+  }
+
+  withSku(sku: string) {
+    this.sku = sku;
     return this;
   }
 
@@ -24,7 +31,7 @@ export class ProductBuilder {
     return this;
   }
 
-  withCategory(category: Category) {
+  withCategory(category: ProductCategory) {
     this.category = category;
     return this;
   }
@@ -39,14 +46,21 @@ export class ProductBuilder {
     return this;
   }
 
+  inactive() {
+    this.active = false;
+    return this;
+  }
+
   build() {
     return {
       name: this.name,
+      sku: this.sku,
       price: this.price,
       stock: this.stock,
       category: this.category,
       type: this.type,
-      imageUrl: this.imageUrl
+      imageUrl: this.imageUrl,
+      active: this.active
     };
   }
 }

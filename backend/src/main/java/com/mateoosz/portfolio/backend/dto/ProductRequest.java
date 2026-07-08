@@ -1,6 +1,6 @@
 package com.mateoosz.portfolio.backend.dto;
 
-import com.mateoosz.portfolio.backend.model.Category;
+import com.mateoosz.portfolio.backend.model.ProductCategory;
 import com.mateoosz.portfolio.backend.model.ProductType;
 
 import jakarta.validation.constraints.NotBlank;
@@ -15,6 +15,9 @@ public class ProductRequest {
     @NotBlank
     private String name;
 
+    @NotBlank
+    private String sku;
+
     @NotNull
     @PositiveOrZero
     private Integer stock;
@@ -24,10 +27,12 @@ public class ProductRequest {
     private Double price;
 
     @NotNull
-    private Category category;
+    private ProductCategory category;
 
     @NotNull
     private ProductType type;
 
     private String imageUrl;
+
+    private Boolean active;
 }

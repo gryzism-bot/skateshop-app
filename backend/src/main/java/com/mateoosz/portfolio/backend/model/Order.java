@@ -28,4 +28,7 @@ public class Order {
 
     // 🔽 getters & setters
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status = OrderStatus.NEW;
 }

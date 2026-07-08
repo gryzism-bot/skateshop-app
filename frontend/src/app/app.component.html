@@ -1,65 +1,121 @@
-<h1>🛹 Skate Shop</h1>
+<div class="shop-shell">
+  <header class="shop-header">
+    <div>
+      <p class="shop-kicker">E-commerce rollerblading shop</p>
+      <h1>Blade Commerce</h1>
+    </div>
+    <div class="header-meta">Skates, wheels, liners, crash pads</div>
+  </header>
 
-<!-- 🔐 LOGIN -->
-<div style="margin-bottom: 20px;">
-  <input #email placeholder="email" />
-  <input #password placeholder="password" type="password" />
-  <button (click)="login(email.value, password.value)">
-    Login
-  </button>
-  <button (click)="logout()">Logout</button>
+  <main class="shop-layout">
+    <section class="catalog" aria-label="Products">
+      <div class="section-heading">
+        <p>Latest catalog</p>
+        <h2>Products</h2>
+      </div>
+
+      <div class="product-grid">
+        <article *ngFor="let product of products()"
+                 class="product-card"
+                 data-testid="product-card">
+
+          <div class="product-image-frame">
+            <img [src]="product.imageUrl"
+                 [alt]="product.name" />
+          </div>
+
+          <div class="product-info">
+            <p class="product-type">{{ product.category }} / {{ product.type }}</p>
+            <h3>{{ product.name }}</h3>
+            <p class="product-sku">SKU {{ product.sku }}</p>
+          </div>
+
+          <div class="product-actions">
+            <strong>{{ product.price }} PLN</strong>
+            <button data-testid="add-to-cart-button" (click)="addToCart(product)">
+              Add to cart
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <aside class="checkout-panel" aria-label="Cart and account">
+      <section class="login-panel">
+        <h2>Account</h2>
+
+        <p class="account-status"
+           [class.account-status-active]="isLoggedIn()"
+           data-testid="account-status">
+          {{ accountMessage() }}
+        </p>
+
+        <p *ngIf="accountError()"
+           class="account-error"
+           data-testid="login-error">
+          {{ accountError() }}
+        </p>
+
+        <label>
+          Email
+          <input #email data-testid="login-email" placeholder="user@test.com" />
+        </label>
+
+        <label>
+          Password
+          <input #password data-testid="login-password" placeholder="password" type="password" />
+        </label>
+
+        <div class="login-actions">
+          <button data-testid="login-button" (click)="login(email.value, password.value)">
+            Login
+          </button>
+          <button class="secondary-button" data-testid="logout-button" (click)="logout()">
+            Logout
+          </button>
+        </div>
+      </section>
+
+      <section class="cart-panel">
+        <div class="cart-heading">
+          <div>
+            <p data-testid="cart-mode">{{ isLoggedIn() ? 'Account cart' : 'Guest cart' }}</p>
+            <h2>Cart</h2>
+          </div>
+          <strong data-testid="cart-total">Total: {{ cart()?.totalPrice || 0 }} PLN</strong>
+        </div>
+
+        <button *ngIf="isLoggedIn() && hasGuestCartItems()"
+                class="merge-button"
+                data-testid="merge-guest-cart-button"
+                (click)="mergeGuestCartToAccountCart()">
+          Add guest items to account cart
+        </button>
+
+        <div *ngIf="cart() as cart" class="cart" data-testid="cart">
+          <article *ngFor="let item of cart.items"
+                   class="cart-item"
+                   data-testid="cart-item">
+            <img [src]="item.imageUrl"
+                 [alt]="item.productName" />
+
+            <div>
+              <h3>{{ item.productName }}</h3>
+              <p *ngIf="item.sku">SKU {{ item.sku }}</p>
+              <p>Quantity {{ item.quantity }}</p>
+              <p>{{ item.productPrice }} PLN</p>
+            </div>
+          </article>
+        </div>
+
+        <p *ngIf="!cart()?.items?.length" class="empty-cart" data-testid="empty-cart">
+          Your cart is empty
+        </p>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="shop-footer">
+    logos industries
+  </footer>
 </div>
-
-<hr>
-
-<!-- 🛍️ PRODUCTS -->
-<h2>Products</h2>
-
-<div *ngFor="let product of products"
-     style="margin:10px; border:1px solid #ccc; padding:10px; width:220px; display:inline-block; vertical-align:top;">
-
-  <img [src]="product.imageUrl"
-       alt="product image"
-       width="150"
-       style="display:block; margin-bottom:10px;" />
-
-  <h3>{{ product.name }}</h3>
-
-  <p><strong>{{ product.price }} PLN</strong></p>
-
-  <button (click)="addToCart(product.id)">
-    Add to cart 🛒
-  </button>
-</div>
-
-<hr>
-
-<!-- 🛒 CART -->
-<h2>🛒 Cart</h2>
-
-<div *ngIf="cart; else emptyCart">
-
-  <div *ngFor="let item of cart.items"
-       style="border:1px solid #aaa; padding:10px; margin:10px; width:250px;">
-
-    <img [src]="item.imageUrl"
-         width="100"
-         style="display:block; margin-bottom:10px;" />
-
-    <h4>{{ item.productName }}</h4>
-
-    <p>Quantity: {{ item.quantity }}</p>
-
-    <p>Price: {{ item.productPrice }} PLN</p>
-
-  </div>
-
-  <!-- 💰 TOTAL -->
-  <h3>Total: {{ cart.totalPrice }} PLN</h3>
-
-</div>
-
-<!-- 🪹 EMPTY STATE -->
-<ng-template #emptyCart>
-  <p>Your cart is empty</p>
-</ng-template>

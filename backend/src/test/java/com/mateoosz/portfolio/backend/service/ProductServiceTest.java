@@ -1,5 +1,6 @@
 package com.mateoosz.portfolio.backend.service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +15,7 @@ import static org.mockito.Mockito.when;
 
 import com.mateoosz.portfolio.backend.dto.ProductRequest;
 import com.mateoosz.portfolio.backend.dto.ProductResponse;
-import com.mateoosz.portfolio.backend.model.Category;
+import com.mateoosz.portfolio.backend.model.ProductCategory;
 import com.mateoosz.portfolio.backend.model.Product;
 import com.mateoosz.portfolio.backend.model.ProductType;
 import com.mateoosz.portfolio.backend.repository.ProductRepository;
@@ -35,15 +36,19 @@ class ProductServiceTest {
         Product product = new Product();
         product.setId(1L);
         product.setName("Skates");
-        product.setCategory(Category.SKATES);
+        product.setSku("SKATE-001");
+        product.setCategory(ProductCategory.SKATES);
         product.setType(ProductType.FREESKATE);
+        product.setCreatedOn(Instant.parse("2026-07-08T10:00:00Z"));
 
-        when(repository.findAll()).thenReturn(List.of(product));
+        when(repository.findAllByOrderByCreatedOnDesc()).thenReturn(List.of(product));
 
         List<ProductResponse> result = service.getAll();
 
         assertEquals(1, result.size());
         assertEquals("Skates", result.get(0).getName());
+        assertEquals(Instant.parse("2026-07-08T10:00:00Z"), result.get(0).getCreatedOn());
+        verify(repository).findAllByOrderByCreatedOnDesc();
     }
 
     @Test
@@ -51,6 +56,7 @@ class ProductServiceTest {
         Product product = new Product();
         product.setId(1L);
         product.setName("Skates");
+        product.setSku("SKATE-001");
 
         when(repository.findById(1L)).thenReturn(Optional.of(product));
 
@@ -75,7 +81,8 @@ class ProductServiceTest {
     void shouldAddValidProduct() {
         ProductRequest request = new ProductRequest();
         request.setName("Skates");
-        request.setCategory(Category.SKATES);
+        request.setSku("SKATE-001");
+        request.setCategory(ProductCategory.SKATES);
         request.setType(ProductType.FREESKATE);
         request.setPrice(100.0);
         request.setStock(10);
@@ -83,7 +90,8 @@ class ProductServiceTest {
         Product saved = new Product();
         saved.setId(1L);
         saved.setName("Skates");
-        saved.setCategory(Category.SKATES);
+        saved.setSku("SKATE-001");
+        saved.setCategory(ProductCategory.SKATES);
         saved.setType(ProductType.FREESKATE);
         saved.setPrice(100.0);
         saved.setStock(10);
@@ -99,7 +107,7 @@ class ProductServiceTest {
     @Test
     void shouldThrowWhenInvalidCategoryForType() {
          ProductRequest request = validRequest();
-        request.setCategory(Category.ACCESSORIES);
+        request.setCategory(ProductCategory.ACCESSORIES);
         request.setType(ProductType.FREESKATE);
 
         RuntimeException ex = assertThrows(
@@ -107,13 +115,27 @@ class ProductServiceTest {
                 () -> service.add(request)
         );
 
-        assertEquals("Invalid category for product type", ex.getMessage());
+        assertEquals("Invalid product type for category", ex.getMessage());
+    }
+
+    @Test
+    void shouldThrowWhenSkuAlreadyExists() {
+        ProductRequest request = validRequest();
+
+        when(repository.existsBySku("TEST-001")).thenReturn(true);
+
+        RuntimeException ex = assertThrows(
+                RuntimeException.class,
+                () -> service.add(request)
+        );
+
+        assertEquals("Product SKU already exists", ex.getMessage());
     }
 
     @Test
     void shouldThrowWhenAccessoryTypeIsInSkatesCategory() {
          ProductRequest request = validRequest();
-        request.setCategory(Category.SKATES);
+        request.setCategory(ProductCategory.SKATES);
         request.setType(ProductType.CRASHPADS);
 
         RuntimeException ex = assertThrows(
@@ -121,7 +143,7 @@ class ProductServiceTest {
                 () -> service.add(request)
         );
 
-        assertEquals("Invalid category for product type", ex.getMessage());
+        assertEquals("Invalid product type for category", ex.getMessage());
     }
 
     @Test
@@ -131,7 +153,8 @@ class ProductServiceTest {
 
         ProductRequest request = new ProductRequest();
         request.setName("Updated");
-        request.setCategory(Category.SKATES);
+        request.setSku("SKATE-UPDATED-001");
+        request.setCategory(ProductCategory.SKATES);
         request.setType(ProductType.FREESKATE);
         request.setPrice(200.0);
         request.setStock(5);
@@ -150,7 +173,8 @@ class ProductServiceTest {
         existing.setId(1L);
 
         ProductRequest request = new ProductRequest();
-        request.setCategory(Category.ACCESSORIES);
+        request.setSku("SKATE-001");
+        request.setCategory(ProductCategory.ACCESSORIES);
         request.setType(ProductType.FREESKATE);
 
         when(repository.findById(1L)).thenReturn(Optional.of(existing));
@@ -182,10 +206,12 @@ class ProductServiceTest {
     private ProductRequest validRequest() {
         ProductRequest request = new ProductRequest();
         request.setName("Test");
+        request.setSku("TEST-001");
         request.setPrice(100.0);
         request.setStock(10);
-        request.setCategory(Category.SKATES);
+        request.setCategory(ProductCategory.SKATES);
         request.setType(ProductType.FREESKATE);
         return request;
     }
 }
+

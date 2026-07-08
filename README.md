@@ -57,7 +57,7 @@ localhost:4200
 third terminal:
 cd playwright
 npm install
-npx playwright test --ui
+npm run ui
 
 ## 🔐 Authentication
 

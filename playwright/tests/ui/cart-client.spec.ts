@@ -1,18 +1,29 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-test('client can login and add product to cart', async ({ page }) => {
-
+test('client can add guest cart items to account cart after login', async ({ page }) => {
   await page.goto('/');
-  await page.click('text=Login');
 
-  await page.getByRole('textbox', { name: 'email' }).fill('user@test.com');
-  await page.getByRole('textbox', { name: 'password' }).fill('1234');
+  await expect(page.getByTestId('cart-mode')).toContainText('Guest cart');
 
-  await page.getByRole('button', { name: 'Login' }).click();
+  await page.getByTestId('add-to-cart-button').first().click();
 
-  await page.locator('div').filter({ hasText: 'Freeskate 1500 PLN Add to' }).getByRole('button').click();
+  await expect(page.getByTestId('cart-item')).toHaveCount(1);
+  await expect(page.getByTestId('cart-total')).toContainText('Total:');
 
-  await expect(page.locator('div.cart')).toBeVisible(); // Wait for the cart to update
+  await expect(page.getByTestId('cart-mode')).toContainText('Guest cart');
+  await expect(page.getByTestId('cart-item')).toHaveCount(1);
 
-  // await expect(page.locator('.cart-item')).toHaveCount(1);
+  await page.getByTestId('login-email').fill('user@test.com');
+  await page.getByTestId('login-password').fill('1234');
+  await page.getByTestId('login-button').click();
+
+  await expect(page.getByTestId('account-status')).toContainText('You are logged in.');
+  await expect(page.getByTestId('cart-mode')).toContainText('Account cart');
+  await expect(page.getByTestId('merge-guest-cart-button')).toBeVisible();
+
+  await page.getByTestId('merge-guest-cart-button').click();
+
+  await expect(page.getByTestId('merge-guest-cart-button')).toBeHidden();
+  await expect(page.getByTestId('cart-item').first()).toBeVisible();
+  await expect(page.getByTestId('cart-total')).toContainText('Total:');
 });

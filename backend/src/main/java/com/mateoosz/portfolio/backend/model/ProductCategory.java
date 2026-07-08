@@ -1,6 +1,6 @@
 package com.mateoosz.portfolio.backend.model;
 
-public enum Category {
+public enum ProductCategory {
     SKATES,
     ACCESSORIES
 }

@@ -2,10 +2,7 @@ import { test } from '../../../fixtures/app.fixture';
 import { expect } from '@playwright/test';
 import { ProductBuilder } from '../../../builders/product.builder';
 
-test('admin can create product', async ({ getProductApi }) => {
-
-  const api = await getProductApi('admin');
-
+test('admin can create product', async ({ testContext }) => {
   const product = new ProductBuilder()
     .withName('Admin Skate Playwright')
     .withPrice(299)
@@ -13,7 +10,7 @@ test('admin can create product', async ({ getProductApi }) => {
     .withImage('https://cdn.bladeville.pl/media/catalog/product/i/m/img_4447.jpg')
     .build();
 
-  const response = await api.createProduct(product);
+  const response = await testContext.api.admin.product.createProduct(product);
 
   const status = response.status();
   const text = await response.text();

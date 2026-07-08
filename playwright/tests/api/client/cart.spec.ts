@@ -1,24 +1,18 @@
-import { test} from '../../../fixtures/app.fixture';
+import { test } from '../../../fixtures/app.fixture';
 import { expect } from '@playwright/test';
 import { ProductBuilder } from '../../../builders/product.builder';
 
-test('user can add product to cart', async ({
-  getProductApi,
-  cartApi
-}) => {
-
-  const adminApi = await getProductApi('client');
-
+test('user can add product to cart', async ({ testContext }) => {
   const product = new ProductBuilder().build();
 
-  const createRes = await adminApi.createProduct(product);
+  const createRes = await testContext.api.admin.product.createProduct(product);
   const created = await createRes.json();
 
   const productId = created.id;
 
-  await cartApi.addToCart(productId, 2);
+  await testContext.api.client.cart.addToCart(productId, 2);
 
-  const cartRes = await cartApi.getCart();
+  const cartRes = await testContext.api.client.cart.getCart();
   const cart = await cartRes.json();
   console.log(await cartRes.text());
 

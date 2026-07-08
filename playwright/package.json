@@ -1,9 +1,14 @@
 {
-  "name": "playwright",
+  "name": "skateshop-playwright",
   "version": "1.59.1",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test --config=playwright.config.ts",
+    "test:api": "playwright test --config=playwright.config.ts --project=api",
+    "test:ui": "playwright test --config=playwright.config.ts --project=ui",
+    "ui": "playwright test --config=playwright.config.ts --ui"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

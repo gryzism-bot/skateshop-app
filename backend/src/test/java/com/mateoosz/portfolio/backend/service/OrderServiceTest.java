@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.mateoosz.portfolio.backend.model.Cart;
 import com.mateoosz.portfolio.backend.model.CartItem;
 import com.mateoosz.portfolio.backend.model.Order;
+import com.mateoosz.portfolio.backend.model.OrderStatus;
 import com.mateoosz.portfolio.backend.model.Product;
 import com.mateoosz.portfolio.backend.model.User;
 import com.mateoosz.portfolio.backend.repository.CartRepository;
@@ -103,5 +104,6 @@ class OrderServiceTest {
         // ✅ Assert
         assertThat(order.getItems()).hasSize(1);
         assertThat(order.getTotalPrice()).isEqualTo(200);
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.NEW);
     }
 }

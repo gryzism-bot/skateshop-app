@@ -1,5 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
+import path from 'path';
 
 /**
  * Read environment variables from file.
@@ -16,13 +17,13 @@ const envFile = process.env.DOCKER
   ? '.env.docker'
   : '.env';
 
-dotenv.config({ path: envFile });
+dotenv.config({ path: path.join(__dirname, envFile) });
 
 console.log('API URL:', process.env.API_URL);
 console.log('UI URL:', process.env.UI_URL);
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: path.join(__dirname, 'tests'),
   timeout: 30_000,
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -46,14 +47,14 @@ export default defineConfig({
   projects: [
     {
       name: 'api',
-      testDir: './tests/api',
+      testDir: path.join(__dirname, 'tests/api'),
       use: {
         baseURL: process.env.API_URL,
       },
     },
     {
       name: 'ui',
-      testDir: './tests/ui',
+      testDir: path.join(__dirname, 'tests/ui'),
       use: {
         baseURL: process.env.UI_URL,
         headless: true,
