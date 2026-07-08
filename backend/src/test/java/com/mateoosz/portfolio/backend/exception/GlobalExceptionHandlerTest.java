@@ -5,11 +5,13 @@ import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.mock;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 class GlobalExceptionHandlerTest {
 
@@ -33,6 +35,16 @@ class GlobalExceptionHandlerTest {
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals("Product not found", response.getBody());
+    }
+
+    @Test
+    void shouldReturnBadRequestForValidationErrors() {
+        ResponseEntity<String> response = handler.handleMethodArgumentNotValid(
+                mock(MethodArgumentNotValidException.class)
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Validation failed", response.getBody());
     }
 
     private HttpInputMessage emptyInputMessage() {

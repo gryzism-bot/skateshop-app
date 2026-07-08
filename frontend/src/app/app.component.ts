@@ -1,8 +1,10 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, OnInit, PLATFORM_ID, inject, signal } from '@angular/core';
+import { switchMap } from 'rxjs/operators';
 
 import { AuthService } from './services/auth.service';
 import { CartResponseDTO, CartService } from './services/cart.service';
+import { Order, OrderService } from './services/order.service';
 import { ProductService } from './services/product.service';
 
 import { Product } from './models/product.model';
@@ -22,11 +24,14 @@ export class AppComponent implements OnInit {
   hasGuestCartItems = signal(false);
   accountMessage = signal('');
   accountError = signal('');
+  checkoutMessage = signal('');
+  checkoutError = signal('');
   private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor(
     private productService: ProductService,
     private cartService: CartService,
+    private orderService: OrderService,
     private authService: AuthService
   ) {}
 
@@ -77,6 +82,9 @@ export class AppComponent implements OnInit {
   }
 
   addToCart(product: Product): void {
+    this.checkoutMessage.set('');
+    this.checkoutError.set('');
+
     if (!this.isLoggedIn()) {
       const cart = this.cartService.addToGuestCart(product, 1);
       this.cart.set(cart);
@@ -142,6 +150,42 @@ export class AppComponent implements OnInit {
       },
       error: (err) => {
         console.error('Merge guest cart error:', err);
+      }
+    });
+  }
+
+  checkout(): void {
+    this.checkoutMessage.set('');
+    this.checkoutError.set('');
+
+    if (!this.isLoggedIn()) {
+      this.checkoutError.set('Log in to checkout.');
+      return;
+    }
+
+    if (!this.cart()?.items?.length && !this.hasGuestCartItems()) {
+      this.checkoutError.set('Your cart is empty.');
+      return;
+    }
+
+    const checkoutRequest = this.hasGuestCartItems()
+      ? this.cartService.mergeGuestCartToAccountCart().pipe(
+          switchMap(() => {
+            this.cartService.clearGuestCart();
+            this.refreshGuestCartState();
+            return this.orderService.checkout();
+          })
+        )
+      : this.orderService.checkout();
+
+    checkoutRequest.subscribe({
+      next: (order: Order) => {
+        this.checkoutMessage.set(`Order ${order.id ?? ''} placed. Status: ${order.status}.`);
+        this.loadCart();
+      },
+      error: (err) => {
+        this.checkoutError.set('Checkout failed. Review your cart and try again.');
+        console.error('Checkout error:', err);
       }
     });
   }

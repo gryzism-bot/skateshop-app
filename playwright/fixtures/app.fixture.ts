@@ -1,11 +1,13 @@
 import { test as base } from './auth.fixture';
 import { CartAPI } from '../api/cart.api';
 import { CartDsl } from '../dsl/cart.dsl';
+import { OrderAPI } from '../api/order.api';
 import { ProductAPI } from '../api/product.api';
 
 type RoleApiContext = {
   product: ProductAPI;
   cart?: CartAPI;
+  order?: OrderAPI;
 };
 
 export type TestContext = {
@@ -13,6 +15,7 @@ export type TestContext = {
     admin: RoleApiContext;
     client: RoleApiContext & {
       cart: CartAPI;
+      order: OrderAPI;
     };
   };
 };
@@ -32,6 +35,7 @@ export const test = base.extend<AppFixtures>({
     const adminProductApi = new ProductAPI(request, adminToken);
     const clientProductApi = new ProductAPI(request, clientToken);
     const clientCartApi = new CartAPI(request, clientToken);
+    const clientOrderApi = new OrderAPI(request, clientToken);
 
     await use({
       api: {
@@ -40,7 +44,8 @@ export const test = base.extend<AppFixtures>({
         },
         client: {
           product: clientProductApi,
-          cart: clientCartApi
+          cart: clientCartApi,
+          order: clientOrderApi
         }
       }
     });

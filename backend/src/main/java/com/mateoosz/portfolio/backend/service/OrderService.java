@@ -9,6 +9,7 @@ import com.mateoosz.portfolio.backend.model.CartItem;
 import com.mateoosz.portfolio.backend.model.Order;
 import com.mateoosz.portfolio.backend.model.OrderItem;
 import com.mateoosz.portfolio.backend.model.User;
+import com.mateoosz.portfolio.backend.exception.NotFoundException;
 import com.mateoosz.portfolio.backend.repository.CartRepository;
 import com.mateoosz.portfolio.backend.repository.OrderRepository;
 import com.mateoosz.portfolio.backend.repository.UserRepository;
@@ -50,17 +51,17 @@ public class OrderService {
 
     private User getUser(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     private Cart getCart(User user) {
         return cartRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new NotFoundException("Cart not found"));
     }
 
     private void validateCart(Cart cart) {
-        if (cart.getItems().isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+        if (cart.getItems() == null || cart.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Cart is empty");
         }
     }
 
@@ -82,7 +83,11 @@ public class OrderService {
     private OrderItem mapToOrderItem(CartItem cartItem, Order order) {
 
         if (cartItem.getProduct() == null) {
-            throw new RuntimeException("Invalid cart item: product missing");
+            throw new IllegalArgumentException("Invalid cart item: product missing");
+        }
+
+        if (cartItem.getQuantity() <= 0) {
+            throw new IllegalArgumentException("Invalid cart item: quantity must be positive");
         }
 
         OrderItem item = new OrderItem();
@@ -100,7 +105,7 @@ public class OrderService {
             .sum();
 
         if (total <= 0) {
-            throw new RuntimeException("Invalid order total");
+            throw new IllegalArgumentException("Invalid order total");
         }
 
         return total;

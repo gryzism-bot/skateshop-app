@@ -92,6 +92,27 @@
           Add guest items to account cart
         </button>
 
+        <div class="checkout-actions">
+          <button data-testid="checkout-button"
+                  [disabled]="!isLoggedIn() || (!cart()?.items?.length && !hasGuestCartItems())"
+                  [title]="!isLoggedIn() ? 'Log in to checkout' : (!cart()?.items?.length && !hasGuestCartItems() ? 'Add items to cart' : 'Place order')"
+                  (click)="checkout()">
+            Checkout
+          </button>
+        </div>
+
+        <p *ngIf="checkoutMessage()"
+           class="checkout-message"
+           data-testid="checkout-message">
+          {{ checkoutMessage() }}
+        </p>
+
+        <p *ngIf="checkoutError()"
+           class="checkout-error"
+           data-testid="checkout-error">
+          {{ checkoutError() }}
+        </p>
+
         <div *ngIf="cart() as cart" class="cart" data-testid="cart">
           <article *ngFor="let item of cart.items"
                    class="cart-item"

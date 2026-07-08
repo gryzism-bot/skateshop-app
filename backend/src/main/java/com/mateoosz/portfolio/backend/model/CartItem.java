@@ -3,6 +3,8 @@ package com.mateoosz.portfolio.backend.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Data
@@ -13,12 +15,18 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @NotNull
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private Product product;
 
+    @Positive
+    @Column(nullable = false)
     private int quantity;
 
-    @ManyToOne
+    @NotNull
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     @JsonIgnore
     private Cart cart;
 }
