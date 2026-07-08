@@ -7,7 +7,8 @@
 }
 
 button,
-input {
+input,
+textarea {
   font: inherit;
 }
 
@@ -95,6 +96,37 @@ button:hover {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 1rem;
+}
+
+.category-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  margin: 0 0 1rem;
+  padding: 0.75rem;
+  border: 1px solid #d9d5ca;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.category-filters legend {
+  padding: 0 0.35rem;
+  color: #64746e;
+  font-size: 0.82rem;
+}
+
+.category-filters label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #3f4b46;
+  font-size: 0.9rem;
+}
+
+.category-filters input {
+  width: 1rem;
+  height: 1rem;
 }
 
 .product-card {
@@ -302,6 +334,159 @@ button:disabled:hover {
   color: #64746e;
 }
 
+.empty-products {
+  margin: 1rem 0 0;
+  padding: 1rem;
+  border: 1px dashed #c8c4ba;
+  border-radius: 8px;
+  color: #64746e;
+  background: #ffffff;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(22 37 34 / 0.58);
+}
+
+.checkout-modal {
+  width: min(680px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  padding: 1rem;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.24);
+}
+
+.modal-header,
+.modal-actions,
+.checkout-summary,
+.modal-cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.modal-header {
+  margin-bottom: 0.85rem;
+}
+
+.modal-header p,
+.payment-box p {
+  margin: 0;
+  color: #64746e;
+  font-size: 0.82rem;
+}
+
+.modal-header h2,
+.payment-box h3 {
+  margin: 0.2rem 0 0;
+}
+
+.icon-button {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  background: #e6e1d5;
+  color: #162522;
+}
+
+.checkout-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.checkout-steps span {
+  padding: 0.5rem;
+  border-radius: 6px;
+  background: #f2efe7;
+  color: #64746e;
+  text-align: center;
+  font-size: 0.82rem;
+}
+
+.checkout-steps .active-step {
+  background: #dcebe5;
+  color: #17483d;
+  font-weight: 700;
+}
+
+.modal-step,
+.modal-cart-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.modal-step label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.86rem;
+  color: #3f4b46;
+}
+
+.modal-step input,
+.modal-step textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #c8c4ba;
+  border-radius: 6px;
+  padding: 0.65rem 0.75rem;
+}
+
+.modal-step textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+.modal-cart-item,
+.checkout-summary,
+.payment-box {
+  padding: 0.7rem;
+  border: 1px solid #e1ddd4;
+  border-radius: 6px;
+  background: #fbfaf7;
+}
+
+.segmented-control,
+.payment-options {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.75rem;
+  border: 1px solid #e1ddd4;
+  border-radius: 6px;
+}
+
+.segmented-control label,
+.payment-options label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.segmented-control input,
+.payment-options input {
+  width: auto;
+}
+
+.payment-box {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.modal-actions {
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
 .shop-footer {
   margin-top: auto;
   padding: 1.25rem clamp(1rem, 4vw, 3rem);
@@ -327,5 +512,14 @@ button:disabled:hover {
   .checkout-panel {
     position: static;
     order: -1;
+  }
+
+  .checkout-steps {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .modal-actions {
+    display: grid;
+    grid-template-columns: 1fr;
   }
 }

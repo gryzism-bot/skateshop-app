@@ -1,12 +1,17 @@
 package com.mateoosz.portfolio.backend.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mateoosz.portfolio.backend.dto.CheckoutRequest;
 import com.mateoosz.portfolio.backend.model.Order;
 import com.mateoosz.portfolio.backend.service.OrderService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -18,10 +23,15 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    // 🧾 Checkout (no cartId!)
-    @PreAuthorize("hasRole('CLIENT')") // only authenticated users can create orders
+    @PreAuthorize("hasRole('CLIENT')")
     @PostMapping
-    public Order createOrder() {
-        return orderService.createOrder();
+    public Order createOrder(@Valid @RequestBody CheckoutRequest request) {
+        return orderService.createOrder(request);
+    }
+
+    @PreAuthorize("hasRole('CLIENT')")
+    @PostMapping("/{id}/pay")
+    public Order payOrder(@PathVariable Long id) {
+        return orderService.payOrder(id);
     }
 }

@@ -35,12 +35,16 @@ class OrderValidationTest {
         order.setUser(null);
         order.setItems(List.of());
         order.setStatus(null);
+        order.setDeliveryMethod(null);
+        order.setPaymentMethod(null);
 
         Set<String> fieldsWithViolations = violationFields(order);
 
         assertTrue(fieldsWithViolations.contains("user"));
         assertTrue(fieldsWithViolations.contains("items"));
         assertTrue(fieldsWithViolations.contains("status"));
+        assertTrue(fieldsWithViolations.contains("deliveryMethod"));
+        assertTrue(fieldsWithViolations.contains("paymentMethod"));
     }
 
     @Test
@@ -80,6 +84,15 @@ class OrderValidationTest {
 
         assertFieldHasAnnotation(Order.class, "totalPrice", Positive.class);
         assertColumn(Order.class, "totalPrice", false, true);
+
+        assertColumn(Order.class, "discountAmount", false, true);
+        assertColumn(Order.class, "contactEmail", false, true);
+
+        assertFieldHasAnnotation(Order.class, "deliveryMethod", NotNull.class);
+        assertColumn(Order.class, "deliveryMethod", false, true);
+
+        assertFieldHasAnnotation(Order.class, "paymentMethod", NotNull.class);
+        assertColumn(Order.class, "paymentMethod", false, true);
 
         assertFieldHasAnnotation(Order.class, "status", NotNull.class);
         assertColumn(Order.class, "status", false, true);
@@ -125,6 +138,11 @@ class OrderValidationTest {
         Order order = new Order();
         order.setUser(user);
         order.setTotalPrice(1298.0);
+        order.setDiscountAmount(0);
+        order.setContactEmail("test@test.com");
+        order.setDeliveryMethod(DeliveryMethod.ADDRESS);
+        order.setDeliveryAddress("Longboard Street 7, Warsaw");
+        order.setPaymentMethod(PaymentMethod.CARD);
         order.setStatus(OrderStatus.NEW);
         order.setCreatedOn(Instant.parse("2026-07-08T10:00:00Z"));
 

@@ -18,11 +18,14 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.mateoosz.portfolio.backend.dto.CheckoutRequest;
 import com.mateoosz.portfolio.backend.exception.NotFoundException;
 import com.mateoosz.portfolio.backend.model.Cart;
 import com.mateoosz.portfolio.backend.model.CartItem;
+import com.mateoosz.portfolio.backend.model.DeliveryMethod;
 import com.mateoosz.portfolio.backend.model.Order;
 import com.mateoosz.portfolio.backend.model.OrderStatus;
+import com.mateoosz.portfolio.backend.model.PaymentMethod;
 import com.mateoosz.portfolio.backend.model.Product;
 import com.mateoosz.portfolio.backend.model.User;
 import com.mateoosz.portfolio.backend.repository.CartRepository;
@@ -80,7 +83,7 @@ class OrderServiceTest {
         when(orderRepository.save(any(Order.class)))
                 .thenAnswer(i -> i.getArgument(0));
 
-        Order order = orderService.createOrder();
+        Order order = orderService.createOrder(checkoutRequest());
 
         assertThat(order.getUser()).isEqualTo(user);
         assertThat(order.getItems()).hasSize(1);
@@ -89,6 +92,29 @@ class OrderServiceTest {
         assertThat(order.getItems().get(0).getPrice()).isEqualTo(100);
         assertThat(order.getTotalPrice()).isEqualTo(200);
         assertThat(order.getStatus()).isEqualTo(OrderStatus.NEW);
+        assertThat(order.getContactEmail()).isEqualTo("test@test.com");
+        assertThat(order.getDeliveryMethod()).isEqualTo(DeliveryMethod.ADDRESS);
+        assertThat(order.getDeliveryAddress()).isEqualTo("Longboard Street 7, Warsaw");
+        assertThat(order.getPaymentMethod()).isEqualTo(PaymentMethod.CARD);
+    }
+
+    @Test
+    void shouldApplyPromoDiscountToOrderTotal() {
+        User user = user();
+        Cart cart = cart(user, cartItem(product(100), 2));
+        CheckoutRequest request = checkoutRequest();
+        request.setPromoCode("roll10");
+
+        mockCurrentUserAndCart(user, cart);
+
+        when(orderRepository.save(any(Order.class)))
+                .thenAnswer(i -> i.getArgument(0));
+
+        Order order = orderService.createOrder(request);
+
+        assertThat(order.getPromoCode()).isEqualTo("ROLL10");
+        assertThat(order.getDiscountAmount()).isEqualTo(20);
+        assertThat(order.getTotalPrice()).isEqualTo(180);
     }
 
     @Test
@@ -101,7 +127,7 @@ class OrderServiceTest {
         when(orderRepository.save(any(Order.class)))
                 .thenAnswer(i -> i.getArgument(0));
 
-        orderService.createOrder();
+        orderService.createOrder(checkoutRequest());
 
         assertThat(cart.getItems()).isEmpty();
         verify(cartRepository).save(cart);
@@ -111,7 +137,7 @@ class OrderServiceTest {
     void shouldThrowWhenCurrentUserDoesNotExist() {
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> orderService.createOrder())
+        assertThatThrownBy(() -> orderService.createOrder(checkoutRequest()))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("User not found");
     }
@@ -123,7 +149,7 @@ class OrderServiceTest {
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(user));
         when(cartRepository.findByUser(user)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> orderService.createOrder())
+        assertThatThrownBy(() -> orderService.createOrder(checkoutRequest()))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Cart not found");
     }
@@ -137,7 +163,7 @@ class OrderServiceTest {
 
         mockCurrentUserAndCart(user, cart);
 
-        assertThatThrownBy(() -> orderService.createOrder())
+        assertThatThrownBy(() -> orderService.createOrder(checkoutRequest()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Cart is empty");
     }
@@ -151,7 +177,7 @@ class OrderServiceTest {
 
         mockCurrentUserAndCart(user, cart);
 
-        assertThatThrownBy(() -> orderService.createOrder())
+        assertThatThrownBy(() -> orderService.createOrder(checkoutRequest()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Invalid cart item: product missing");
     }
@@ -163,9 +189,70 @@ class OrderServiceTest {
 
         mockCurrentUserAndCart(user, cart);
 
-        assertThatThrownBy(() -> orderService.createOrder())
+        assertThatThrownBy(() -> orderService.createOrder(checkoutRequest()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Invalid cart item: quantity must be positive");
+    }
+
+    @Test
+    void shouldRejectAddressDeliveryWithoutAddress() {
+        User user = user();
+        Cart cart = cart(user, cartItem(product(100), 1));
+        CheckoutRequest request = checkoutRequest();
+        request.setDeliveryAddress("");
+
+        mockCurrentUserAndCart(user, cart);
+
+        assertThatThrownBy(() -> orderService.createOrder(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Delivery address is required");
+    }
+
+    @Test
+    void shouldRejectPaczkomatDeliveryWithoutPaczkomatCode() {
+        User user = user();
+        Cart cart = cart(user, cartItem(product(100), 1));
+        CheckoutRequest request = checkoutRequest();
+        request.setDeliveryMethod(DeliveryMethod.PACZKOMAT);
+        request.setPaczkomatCode("");
+
+        mockCurrentUserAndCart(user, cart);
+
+        assertThatThrownBy(() -> orderService.createOrder(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Paczkomat code is required");
+    }
+
+    @Test
+    void shouldRejectUnknownPromoCode() {
+        User user = user();
+        Cart cart = cart(user, cartItem(product(100), 1));
+        CheckoutRequest request = checkoutRequest();
+        request.setPromoCode("NOPE");
+
+        mockCurrentUserAndCart(user, cart);
+
+        assertThatThrownBy(() -> orderService.createOrder(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Promo code is invalid");
+    }
+
+    @Test
+    void shouldChangeNewOrderStatusToPaid() {
+        User user = user();
+        Order order = new Order();
+        order.setId(10L);
+        order.setUser(user);
+        order.setStatus(OrderStatus.NEW);
+
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(user));
+        when(orderRepository.findById(10L)).thenReturn(Optional.of(order));
+        when(orderRepository.save(order)).thenReturn(order);
+
+        Order paidOrder = orderService.payOrder(10L);
+
+        assertThat(paidOrder.getStatus()).isEqualTo(OrderStatus.PAID);
+        verify(orderRepository).save(order);
     }
 
     private void mockCurrentUserAndCart(User user, Cart cart) {
@@ -201,5 +288,14 @@ class OrderServiceTest {
         cart.setItems(new ArrayList<>(List.of(cartItem)));
         cartItem.setCart(cart);
         return cart;
+    }
+
+    private CheckoutRequest checkoutRequest() {
+        CheckoutRequest request = new CheckoutRequest();
+        request.setContactEmail("test@test.com");
+        request.setDeliveryMethod(DeliveryMethod.ADDRESS);
+        request.setDeliveryAddress("Longboard Street 7, Warsaw");
+        request.setPaymentMethod(PaymentMethod.CARD);
+        return request;
     }
 }

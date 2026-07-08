@@ -14,8 +14,26 @@
         <h2>Products</h2>
       </div>
 
+      <fieldset class="category-filters" aria-label="Product categories">
+        <legend>Show categories</legend>
+        <label>
+          <input type="checkbox"
+                 data-testid="filter-skates"
+                 [checked]="showSkates()"
+                 (change)="toggleSkatesFilter($any($event.target).checked)" />
+          Skates
+        </label>
+        <label>
+          <input type="checkbox"
+                 data-testid="filter-accessories"
+                 [checked]="showAccessories()"
+                 (change)="toggleAccessoriesFilter($any($event.target).checked)" />
+          Accessories
+        </label>
+      </fieldset>
+
       <div class="product-grid">
-        <article *ngFor="let product of products()"
+        <article *ngFor="let product of filteredProducts()"
                  class="product-card"
                  data-testid="product-card">
 
@@ -25,7 +43,7 @@
           </div>
 
           <div class="product-info">
-            <p class="product-type">{{ product.category }} / {{ product.type }}</p>
+            <p class="product-type" data-testid="product-category">{{ product.category }} / {{ product.type }}</p>
             <h3>{{ product.name }}</h3>
             <p class="product-sku">SKU {{ product.sku }}</p>
           </div>
@@ -38,6 +56,12 @@
           </div>
         </article>
       </div>
+
+      <p *ngIf="products().length && !filteredProducts().length"
+         class="empty-products"
+         data-testid="empty-products">
+        No products match selected categories
+      </p>
     </section>
 
     <aside class="checkout-panel" aria-label="Cart and account">
@@ -94,9 +118,9 @@
 
         <div class="checkout-actions">
           <button data-testid="checkout-button"
-                  [disabled]="!isLoggedIn() || (!cart()?.items?.length && !hasGuestCartItems())"
-                  [title]="!isLoggedIn() ? 'Log in to checkout' : (!cart()?.items?.length && !hasGuestCartItems() ? 'Add items to cart' : 'Place order')"
-                  (click)="checkout()">
+                  [disabled]="!isLoggedIn() || hasGuestCartItems() || !cart()?.items?.length"
+                  [title]="!isLoggedIn() ? 'Log in to checkout' : (hasGuestCartItems() ? 'Add guest items to account cart before checkout' : (!cart()?.items?.length ? 'Add items to cart' : 'Checkout'))"
+                  (click)="openCheckout()">
             Checkout
           </button>
         </div>
@@ -139,4 +163,174 @@
   <footer class="shop-footer">
     logos industries
   </footer>
+
+  <div *ngIf="checkoutOpen()"
+       class="modal-backdrop"
+       data-testid="checkout-modal"
+       role="dialog"
+       aria-modal="true"
+       aria-label="Checkout">
+    <section class="checkout-modal">
+      <header class="modal-header">
+        <div>
+          <p>Checkout</p>
+          <h2>Order flow</h2>
+        </div>
+        <button class="icon-button"
+                data-testid="close-checkout-button"
+                aria-label="Close checkout"
+                (click)="closeCheckout()">
+          x
+        </button>
+      </header>
+
+      <nav class="checkout-steps" aria-label="Checkout steps">
+        <span [class.active-step]="checkoutStep() === 1">Cart</span>
+        <span [class.active-step]="checkoutStep() === 2">Contact</span>
+        <span [class.active-step]="checkoutStep() === 3">Delivery</span>
+        <span [class.active-step]="checkoutStep() === 4">Payment</span>
+      </nav>
+
+      <p *ngIf="checkoutError()"
+         class="checkout-error"
+         data-testid="checkout-modal-error">
+        {{ checkoutError() }}
+      </p>
+
+      <section *ngIf="checkoutStep() === 1" class="modal-step" data-testid="checkout-step-cart">
+        <div class="modal-cart-list">
+          <article *ngFor="let item of cart()?.items"
+                   class="modal-cart-item"
+                   data-testid="checkout-cart-item">
+            <span>{{ item.productName }}</span>
+            <span>{{ item.quantity }} x {{ item.productPrice }} PLN</span>
+          </article>
+        </div>
+
+        <div class="checkout-summary">
+          <span>Items total</span>
+          <strong data-testid="checkout-subtotal">{{ checkoutSubtotal() }} PLN</strong>
+        </div>
+      </section>
+
+      <section *ngIf="checkoutStep() === 2" class="modal-step" data-testid="checkout-step-contact">
+        <label>
+          Promo code
+          <input data-testid="checkout-promo-code"
+                 [(ngModel)]="checkoutPromoCode"
+                 placeholder="ROLL10" />
+        </label>
+
+        <div class="checkout-summary">
+          <span>Discount</span>
+          <strong data-testid="checkout-discount">-{{ checkoutDiscount() }} PLN</strong>
+        </div>
+
+        <div class="checkout-summary">
+          <span>Total after promo</span>
+          <strong data-testid="checkout-total">{{ checkoutTotalAfterDiscount() }} PLN</strong>
+        </div>
+
+        <label>
+          Email
+          <input data-testid="checkout-contact-email"
+                 [(ngModel)]="checkoutContactEmail"
+                 placeholder="customer@test.com" />
+        </label>
+      </section>
+
+      <section *ngIf="checkoutStep() === 3" class="modal-step" data-testid="checkout-step-delivery">
+        <fieldset class="segmented-control">
+          <legend>Delivery</legend>
+          <label>
+            <input type="radio"
+                   name="deliveryMethod"
+                   value="ADDRESS"
+                   [(ngModel)]="checkoutDeliveryMethod" />
+            Address
+          </label>
+          <label>
+            <input type="radio"
+                   name="deliveryMethod"
+                   value="PACZKOMAT"
+                   [(ngModel)]="checkoutDeliveryMethod" />
+            Paczkomat
+          </label>
+        </fieldset>
+
+        <label *ngIf="checkoutDeliveryMethod === 'ADDRESS'">
+          Delivery address
+          <textarea data-testid="checkout-delivery-address"
+                    [(ngModel)]="checkoutDeliveryAddress"
+                    placeholder="Street, city, postal code"></textarea>
+        </label>
+
+        <label *ngIf="checkoutDeliveryMethod === 'PACZKOMAT'">
+          Paczkomat
+          <input data-testid="checkout-paczkomat-code"
+                 [(ngModel)]="checkoutPaczkomatCode"
+                 placeholder="WAW01A" />
+        </label>
+
+        <fieldset class="payment-options">
+          <legend>Payment</legend>
+          <label>
+            <input type="radio"
+                   name="paymentMethod"
+                   value="BLIK"
+                   [(ngModel)]="checkoutPaymentMethod" />
+            BLIK
+          </label>
+          <label>
+            <input type="radio"
+                   name="paymentMethod"
+                   value="CARD"
+                   [(ngModel)]="checkoutPaymentMethod" />
+            Card
+          </label>
+          <label>
+            <input type="radio"
+                   name="paymentMethod"
+                   value="ON_DELIVERY"
+                   [(ngModel)]="checkoutPaymentMethod" />
+            On delivery
+          </label>
+        </fieldset>
+      </section>
+
+      <section *ngIf="checkoutStep() === 4" class="modal-step" data-testid="checkout-step-payment">
+        <div *ngIf="currentOrder() as order" class="payment-box">
+          <p>Order {{ order.id }}</p>
+          <h3 data-testid="checkout-order-status">{{ order.status }}</h3>
+          <strong data-testid="checkout-order-total">{{ order.totalPrice }} PLN</strong>
+
+          <button *ngIf="order.status === 'NEW'"
+                  data-testid="mock-pay-button"
+                  (click)="payCurrentOrder()">
+            Mock payment
+          </button>
+        </div>
+      </section>
+
+      <footer class="modal-actions">
+        <button *ngIf="checkoutStep() > 1 && checkoutStep() < 4"
+                class="secondary-button"
+                data-testid="checkout-back-button"
+                (click)="previousCheckoutStep()">
+          Back
+        </button>
+        <button *ngIf="checkoutStep() < 3"
+                data-testid="checkout-next-button"
+                (click)="nextCheckoutStep()">
+          Continue
+        </button>
+        <button *ngIf="checkoutStep() === 3"
+                data-testid="checkout-place-order-button"
+                [disabled]="!canSubmitCheckout()"
+                (click)="submitCheckout()">
+          Place order
+        </button>
+      </footer>
+    </section>
+  </div>
 </div>

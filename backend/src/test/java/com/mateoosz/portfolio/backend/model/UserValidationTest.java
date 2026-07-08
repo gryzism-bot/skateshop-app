@@ -55,6 +55,8 @@ class UserValidationTest {
 
         assertFieldHasAnnotation("role", NotNull.class);
         assertColumn("role", false, true);
+
+        assertTrue(field("address").getAnnotation(Column.class) == null);
     }
 
     private User validUser() {

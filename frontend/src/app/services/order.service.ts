@@ -9,10 +9,26 @@ export interface OrderItem {
   price: number;
 }
 
+export interface CheckoutRequest {
+  promoCode?: string;
+  contactEmail: string;
+  deliveryMethod: 'ADDRESS' | 'PACZKOMAT';
+  deliveryAddress?: string;
+  paczkomatCode?: string;
+  paymentMethod: 'BLIK' | 'CARD' | 'ON_DELIVERY';
+}
+
 export interface Order {
   id?: number;
   items: OrderItem[];
   totalPrice: number;
+  discountAmount?: number;
+  promoCode?: string;
+  contactEmail?: string;
+  deliveryMethod?: string;
+  deliveryAddress?: string;
+  paczkomatCode?: string;
+  paymentMethod?: string;
   status: string;
   createdOn?: string;
 }
@@ -26,7 +42,11 @@ export class OrderService {
 
   constructor(private http: HttpClient) {}
 
-  checkout(): Observable<Order> {
-    return this.http.post<Order>(this.apiUrl, {});
+  checkout(request: CheckoutRequest): Observable<Order> {
+    return this.http.post<Order>(this.apiUrl, request);
+  }
+
+  pay(orderId: number): Observable<Order> {
+    return this.http.post<Order>(`${this.apiUrl}/${orderId}/pay`, {});
   }
 }

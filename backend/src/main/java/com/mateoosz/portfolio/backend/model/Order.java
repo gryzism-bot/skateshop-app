@@ -46,6 +46,28 @@ public class Order {
     @Column(nullable = false)
     private double totalPrice;
 
+    @Column(nullable = false)
+    private double discountAmount;
+
+    private String promoCode;
+
+    @Column(nullable = false)
+    private String contactEmail;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DeliveryMethod deliveryMethod;
+
+    private String deliveryAddress;
+
+    private String paczkomatCode;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentMethod paymentMethod;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
