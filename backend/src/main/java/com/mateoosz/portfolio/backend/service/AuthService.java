@@ -26,20 +26,15 @@ public class AuthService {
 
     public String login(String email, String password) {
 
-    User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new NotFoundException("User not found"));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
-    System.out.println("USER FOUND: " + user.getEmail());
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new BadCredentialsException("Invalid password");
+        }
 
-    if (!passwordEncoder.matches(password, user.getPassword())) {
-        System.out.println("PASSWORD MISMATCH");
-        throw new BadCredentialsException("Invalid password");
+        return jwtService.generateToken(user);
     }
-
-    String token = jwtService.generateToken(user);
-
-    return token;
-}
 
     public User register(String email, String password) {
 

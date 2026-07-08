@@ -51,6 +51,11 @@ export class ProductBuilder {
     return this;
   }
 
+  withActive(active: boolean) {
+    this.active = active;
+    return this;
+  }
+
   build() {
     return {
       name: this.name,

@@ -6,16 +6,23 @@ import org.springframework.stereotype.Service;
 
 import com.mateoosz.portfolio.backend.dto.ProductRequest;
 import com.mateoosz.portfolio.backend.dto.ProductResponse;
+import com.mateoosz.portfolio.backend.exception.NotFoundException;
 import com.mateoosz.portfolio.backend.model.Product;
 import com.mateoosz.portfolio.backend.repository.ProductRepository;
+
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final Validator validator;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository,
+                          Validator validator) {
         this.productRepository = productRepository;
+        this.validator = validator;
     }
 
     public List<ProductResponse> getAll() {
@@ -27,14 +34,14 @@ public class ProductService {
 
     public ProductResponse getById(Long id) {
     Product product = productRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Product not found"));
+            .orElseThrow(() -> new NotFoundException("Product not found"));
 
     return mapToResponse(product);
     }
 
     public ProductResponse delete(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
 
         productRepository.delete(product);
 
@@ -42,6 +49,8 @@ public class ProductService {
     }
 
     public ProductResponse add(ProductRequest request) {
+        validateRequest(request);
+
         Product product = mapToEntity(request);
 
         validateProduct(product);
@@ -52,9 +61,10 @@ public class ProductService {
     }
 
     public ProductResponse update(Long id, ProductRequest request) {
+        validateRequest(request);
 
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
 
         product.setName(request.getName());
         product.setSku(request.getSku());
@@ -105,6 +115,14 @@ public class ProductService {
 
 // business rules
 
+    private void validateRequest(ProductRequest request) {
+        var violations = validator.validate(request);
+
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+    }
+
     private void validateProduct(Product product) {
 
     if (product.getCategory() == null || product.getType() == null) {
@@ -146,6 +164,10 @@ public class ProductService {
     }
 
     private boolean resolveActive(ProductRequest request) {
+        if (request.getStock() != null && request.getStock() == 0) {
+            return false;
+        }
+
         return request.getActive() == null || request.getActive();
     }
 }

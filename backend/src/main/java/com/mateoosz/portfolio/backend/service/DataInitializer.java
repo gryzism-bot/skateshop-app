@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +22,8 @@ import com.mateoosz.portfolio.backend.repository.UserRepository;
 @Configuration
 public class DataInitializer {
 
+    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
+
     @Bean
     CommandLineRunner initData(UserRepository userRepository,
                                ProductRepository productRepository,
@@ -33,7 +37,7 @@ public class DataInitializer {
                 admin.setRole(Role.ADMIN);
 
                 userRepository.save(admin);
-                System.out.println("Admin user created");
+                log.info("Admin user created");
             }
 
             if (userRepository.findByEmail("user@test.com").isEmpty()) {
@@ -43,7 +47,7 @@ public class DataInitializer {
                 user.setRole(Role.CLIENT);
 
                 userRepository.save(user);
-                System.out.println("Client user created");
+                log.info("Client user created");
             }
 
             if (productRepository.count() == 0) {
@@ -129,7 +133,7 @@ public class DataInitializer {
                         now.minus(8, ChronoUnit.DAYS),
                         "https://cdn.bladeville.pl/media/catalog/product/d/s/dsdoyi7u.jpg"));
 
-                System.out.println("Sample products created");
+                log.info("Sample products created");
             }
         };
     }

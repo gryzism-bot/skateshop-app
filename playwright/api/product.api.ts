@@ -16,7 +16,21 @@ export class ProductAPI {
     });
   }
 
+  async updateProduct(productId: number, data: any) {
+    return this.request.put(`/api/products/${productId}`, {
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+        'Content-Type': 'application/json'
+      },
+      data
+    });
+  }
+
   async getAll() {
     return this.request.get('/api/products');
+  }
+
+  async getById(productId: number) {
+    return this.request.get(`/api/products/${productId}`);
   }
 }
