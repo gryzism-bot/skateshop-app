@@ -14,9 +14,17 @@ https://youtube.com/shorts/ZAp0CHNlNBI?feature=share
 * Role-based access (ADMIN / CLIENT)
 * REST API with DTOs
 
-partial UI, login and password inputs, logout, get all products ngFor, cart for logged user
+UI, login and password inputs, logout, get all products ngFor, cart for logged user
 
-inits with 4 products, user and admin
+inits with 8 products, user and admin
+
+cart, userless cart, merge userless browser cart to "real cart" button, checkout modal, mock payment button, order paid status, admin panel, order dashboard, change status to sent button 
+
+## all made for Playwright framework showcase: 
+
+Business POM with Component Locator subtree, with page's locator functions, freshClient fixture, browserless login, textContext object in test fixture dependency chain, with nested getToken workerFixture for roles, with api client: admin's product and user's product/cart/order. Made as SO from SOLID as possible for scalability and openness. 
+
+but backend is brought to early-commercial level in case of future use 
 
 ## 🛠️ Tech Stack
 
