@@ -4,7 +4,7 @@ import { test } from '../../../fixtures/app.fixture';
 
 const randomSuffixPattern = /\s\[pw-[a-z0-9-]+\]$/;
 
-test.describe('product API', () => {
+test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
   test('admin can create product', async ({ testContext }) => {
     const product = new ProductBuilder()
       .withName('Admin Skate Playwright')

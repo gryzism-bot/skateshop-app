@@ -2,24 +2,26 @@ import { test } from '../../../fixtures/app.fixture';
 import { expect } from '@playwright/test';
 import { ProductBuilder } from '../../../builders/product.builder';
 
-test('user can add product to cart', async ({ testContext }) => {
-  const product = new ProductBuilder().build();
+test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
+  test('user can add product to cart', async ({ testContext }) => {
+    const product = new ProductBuilder().build();
 
-  const createRes = await testContext.api.admin.product.createProduct(product);
-  const created = await createRes.json();
+    const createRes = await testContext.api.admin.product.createProduct(product);
+    const created = await createRes.json();
 
-  const productId = created.id;
+    const productId = created.id;
 
-  await testContext.api.client.cart.addToCart(productId, 2);
+    await testContext.api.client.cart.addToCart(productId, 2);
 
-  const cartRes = await testContext.api.client.cart.getCart();
-  const cart = await cartRes.json();
-  console.log(await cartRes.text());
+    const cartRes = await testContext.api.client.cart.getCart();
+    const cart = await cartRes.json();
+    console.log(await cartRes.text());
 
-  expect(cart.items.length).toBeGreaterThan(0);
+    expect(cart.items.length).toBeGreaterThan(0);
 
-  const item = cart.items.find((i: any) => i.productId === productId);
+    const item = cart.items.find((i: any) => i.productId === productId);
 
-  expect(item).toBeTruthy();
-  expect(item.quantity).toBe(2);
+    expect(item).toBeTruthy();
+    expect(item.quantity).toBe(2);
+  });
 });
