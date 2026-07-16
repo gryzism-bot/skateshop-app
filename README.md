@@ -22,9 +22,13 @@ cart, userless cart, merge userless browser cart to "real cart" button, checkout
 
 ## all made for Playwright framework showcase: 
 
-Business POM with Component Locator subtree, with page's locator functions, ProductBuilder, freshClient fixture, browserless login, textContext object in test fixture dependency chain, with nested getToken workerFixture for roles, with api client: admin's product and user's product/cart/order. Made as SO from SOLID as possible for scalability and openness. 
+Business POM with Component Locator subtree, with page's locator functions, ProductBuilder, freshClient fixture, browserless login, textContext object in test fixture dependency chain, with nested getToken workerFixture for roles, with api client: admin's product and user's product/cart/order, only api and only ui tests command with test tags and --grep. Made as SO from SOLID as possible for scalability and openness. 
 
 but backend is brought to early-commercial level in case of future use 
+
+npx playwright test --grep @suite-api
+npx playwright test --grep @suite-ui
+npx playwright test --grep @suite-all
 
 ## 🛠️ Tech Stack
 
