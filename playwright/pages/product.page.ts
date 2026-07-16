@@ -96,6 +96,10 @@ export class ProductPage {
     await this.cart.expectItemVisible(productName);
   }
 
+  async expectCartItemVisible(productName: string) {
+    await this.cart.expectItemVisible(productName);
+  }
+
   async startCheckout() {
     await this.checkoutModal.open();
     return new CheckoutModalPage(this.page);
