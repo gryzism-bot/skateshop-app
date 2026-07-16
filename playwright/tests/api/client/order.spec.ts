@@ -3,7 +3,7 @@ import { ProductBuilder } from '../../../builders/product.builder';
 import { test } from '../../../fixtures/app.fixture';
 
 test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
-  test('user can checkout account cart', async ({ testContext }) => {
+  test('user can checkout account cart', async ({ testContext, freshApiClient }) => {
     const product = new ProductBuilder()
       .withName('Checkout Skate')
       .withPrice(250)
@@ -19,7 +19,7 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
     const checkoutResponse = await testContext.api.client.order.checkout({
       promoCode: 'ROLL10',
-      contactEmail: 'user@test.com',
+      contactEmail: freshApiClient.email,
       deliveryMethod: 'ADDRESS',
       deliveryAddress: 'Longboard Street 7, Warsaw',
       paymentMethod: 'CARD'

@@ -39,14 +39,10 @@ type AppFixtures = {
 
 export const test = base.extend<AppFixtures>({
   // Test-scoped: business API clients composed around Playwright's request fixture.
-  testContext: async ({ request, getTokenWorkerFixture }, use) => {
+  testContext: async ({ request, getTokenWorkerFixture, freshApiClient }, use) => {
     const adminToken = await getTokenWorkerFixture('admin');
-    const clientToken = await getTokenWorkerFixture('client');
 
     const adminProductApi = new ProductAPI(request, adminToken);
-    const clientProductApi = new ProductAPI(request, clientToken);
-    const clientCartApi = new CartAPI(request, clientToken);
-    const clientOrderApi = new OrderAPI(request, clientToken);
 
     await use({
       api: {
@@ -54,18 +50,17 @@ export const test = base.extend<AppFixtures>({
           product: adminProductApi
         },
         client: {
-          product: clientProductApi,
-          cart: clientCartApi,
-          order: clientOrderApi
+          product: freshApiClient.product,
+          cart: freshApiClient.cart,
+          order: freshApiClient.order
         }
       }
     });
   },
 
   // Test-scoped: direct cart API client for specs/dsl that only need cart behavior.
-  cartApi: async ({ request, getTokenWorkerFixture }, use) => {
-    const token = await getTokenWorkerFixture('client');
-    await use(new CartAPI(request, token));
+  cartApi: async ({ freshApiClient }, use) => {
+    await use(freshApiClient.cart);
   },
 
   // Test-scoped: cart workflow DSL built on the cart API client.
@@ -107,8 +102,12 @@ export const test = base.extend<AppFixtures>({
   },
 
   // Test-scoped: factory for product API clients with a chosen seeded role.
-  getProductApi: async ({ request, getTokenWorkerFixture }, use) => {
+  getProductApi: async ({ request, getTokenWorkerFixture, freshApiClient }, use) => {
     await use(async (role) => {
+      if (role === 'client') {
+        return freshApiClient.product;
+      }
+
       const token = await getTokenWorkerFixture(role);
       return new ProductAPI(request, token);
     });

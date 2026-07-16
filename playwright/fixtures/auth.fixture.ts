@@ -1,7 +1,7 @@
 import { test as base, request as playwrightRequest } from '@playwright/test';
 
 type WorkerFixtures = {
-  getTokenWorkerFixture: (role: 'admin' | 'client') => Promise<string>;
+  getTokenWorkerFixture: (role: 'admin') => Promise<string>;
 };
 
 export const test = base.extend<{}, WorkerFixtures>({
@@ -15,15 +15,14 @@ export const test = base.extend<{}, WorkerFixtures>({
 
       const cache = new Map<string, string>();
 
-      const getTokenWorkerFixture = async (role: 'admin' | 'client') => {
+      const getTokenWorkerFixture = async (role: 'admin') => {
 
         if (cache.has(role)) {
           return cache.get(role)!;
         }
 
         const credentials = {
-          admin: { email: 'admin@test.com', password: 'admin123' },
-          client: { email: 'user@test.com', password: '1234' }
+          admin: { email: 'admin@test.com', password: 'admin123' }
         };
 
         const res = await request.post('/api/auth/login', {

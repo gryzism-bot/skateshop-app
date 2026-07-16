@@ -16,7 +16,7 @@ export class OrderAPI {
   ) { }
 
   async checkout(body: CheckoutRequest = {
-    contactEmail: 'user@test.com',
+    contactEmail: 'client@test.com',
     deliveryMethod: 'ADDRESS',
     deliveryAddress: 'Longboard Street 7, Warsaw',
     paymentMethod: 'CARD'
