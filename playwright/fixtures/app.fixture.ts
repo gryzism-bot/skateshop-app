@@ -10,6 +10,15 @@ type RoleApiContext = {
   order?: OrderAPI;
 };
 
+type FreshApiClient = {
+  email: string;
+  password: string;
+  token: string;
+  product: ProductAPI;
+  cart: CartAPI;
+  order: OrderAPI;
+};
+
 export type TestContext = {
   api: {
     admin: RoleApiContext;
@@ -24,6 +33,7 @@ type AppFixtures = {
   testContext: TestContext;
   cartApi: CartAPI;
   cartDsl: CartDsl;
+  freshApiClient: FreshApiClient;
   getProductApi: (role: 'admin' | 'client') => Promise<ProductAPI>;
 };
 
@@ -61,6 +71,39 @@ export const test = base.extend<AppFixtures>({
   // Test-scoped: cart workflow DSL built on the cart API client.
   cartDsl: async ({ cartApi }, use) => {
     await use(new CartDsl(cartApi));
+  },
+
+  // Test-scoped: unique user and API clients for scenarios that must not share account cart state.
+  freshApiClient: async ({ request }, use) => {
+    const password = '1234';
+    const email = `api-client-${Date.now()}-${Math.floor(Math.random() * 10000)}@test.com`;
+
+    const registerResponse = await request.post('/api/auth/register', {
+      data: { email, password }
+    });
+
+    if (!registerResponse.ok()) {
+      throw new Error(`Fresh API client registration failed with status ${registerResponse.status()}`);
+    }
+
+    const loginResponse = await request.post('/api/auth/login', {
+      data: { email, password }
+    });
+
+    if (!loginResponse.ok()) {
+      throw new Error(`Fresh API client login failed with status ${loginResponse.status()}`);
+    }
+
+    const token = await loginResponse.text();
+
+    await use({
+      email,
+      password,
+      token,
+      product: new ProductAPI(request, token),
+      cart: new CartAPI(request, token),
+      order: new OrderAPI(request, token)
+    });
   },
 
   // Test-scoped: factory for product API clients with a chosen seeded role.
