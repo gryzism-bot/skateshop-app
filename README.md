@@ -27,7 +27,7 @@ config has:
 fixtures injected:
 - freshClient user with random email
 - browserless login for freshClient
-- apiClient for admin and user to setup and teardown test data
+- api client for admin and user to setup and teardown test data
 - worker token fixture
 
 tests receive: 

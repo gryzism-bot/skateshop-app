@@ -1,58 +1,51 @@
-import { APIRequestContext, expect } from '@playwright/test';
-import { ProductBuilder } from '../../builders/product.builder';
+import { expect } from '@playwright/test';
 import { test } from '../../fixtures/ui.fixture';
 
 const wheelsImageUrl = 'https://cdn.bladeville.pl/media/catalog/product/i/m/img_2147.jpg';
 
 test.describe('checkout UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
   test('logged client can filter products, checkout skate, and pay order', async ({
-    apiRequestContext,
+    api,
     freshClient,
-    getTokenWorkerFixture,
     productPage
   }) => {
     //given
-    const adminToken = await getTokenWorkerFixture('admin');
+    const skateResponse = await api.product.admin.createRandom({
+      name: `UI Checkout Skate ${Date.now()}`,
+      category: 'SKATES',
+      type: 'FREESKATE',
+      price: 300,
+      stock: 4
+    });
 
-    const skate = await createProduct(apiRequestContext, adminToken, new ProductBuilder()
-      .withName(`UI Checkout Skate ${Date.now()}`)
-      .withSku(`UI-SKATE-${Date.now()}`)
-      .withCategory('SKATES')
-      .withType('FREESKATE')
-      .withPrice(300)
-      .withStock(4)
-      .build());
+    expect(skateResponse.ok()).toBeTruthy();
+    const skate = await skateResponse.json();
 
-    const accessory = await createProduct(apiRequestContext, adminToken, new ProductBuilder()
-      .withName(`UI Checkout Wheels ${Date.now()}`)
-      .withSku(`UI-WHEELS-${Date.now()}`)
-      .withCategory('ACCESSORIES')
-      .withType('WHEELS')
-      .withImage(wheelsImageUrl)
-      .withPrice(120)
-      .withStock(6)
-      .build());
+    const accessoryResponse = await api.product.admin.createRandom({
+      name: `UI Checkout Wheels ${Date.now()}`,
+      category: 'ACCESSORIES',
+      type: 'WHEELS',
+      imageUrl: wheelsImageUrl,
+      price: 120,
+      stock: 6
+    });
 
-    //when
+    expect(accessoryResponse.ok()).toBeTruthy();
+    const accessory = await accessoryResponse.json();
+
     await productPage.openAsLoggedClient(freshClient.token);
 
-    //then
     await productPage.expectProductsVisible([skate.name, accessory.name]);
 
-    //when
     await productPage.hideSkates();
 
-    //then
     await productPage.expectSkatesHidden(skate.name);
     await productPage.expectProductVisible(accessory.name);
 
-    //when
     await productPage.hideAccessories();
 
-    //then
     await productPage.expectCatalogEmpty();
 
-    //when
     await productPage.showSkates();
     await productPage.addProductToCart(skate.name);
 
@@ -68,16 +61,3 @@ test.describe('checkout UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
     expect(paidOrder.status).toBe('PAID');
   });
 });
-
-async function createProduct(api: APIRequestContext, token: string, product: any) {
-  const response = await api.post('/api/products', {
-    headers: {
-      Authorization: `Bearer ${token}`
-    },
-    data: product
-  });
-
-  //then
-  expect(response.ok()).toBeTruthy();
-  return response.json();
-}

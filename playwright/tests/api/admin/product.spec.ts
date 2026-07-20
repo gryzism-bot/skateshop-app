@@ -38,7 +38,7 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
   test('client cannot update product', async ({ testContext }) => {
     //given
-    const createdProduct = await createProduct(testContext, new ProductBuilder().build());
+    const createdProduct = await createRandomProduct(testContext);
     const update = new ProductBuilder()
       .withSku(createdProduct.sku)
       .withName('Client Update Attempt')
@@ -53,7 +53,7 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
   test('admin can update added product', async ({ testContext }) => {
     //given
-    const createdProduct = await createProduct(testContext, new ProductBuilder().build());
+    const createdProduct = await createRandomProduct(testContext);
     const update = new ProductBuilder()
       .withName('Updated Freeskate')
       .withSku(createdProduct.sku)
@@ -157,7 +157,7 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
   test('admin can update whole product from skate to accessory', async ({ testContext }) => {
     //given
-    const createdProduct = await createProduct(testContext, new ProductBuilder().build());
+    const createdProduct = await createRandomProduct(testContext);
     const update = new ProductBuilder()
       .withName('Updated Wheels')
       .withSku(createdProduct.sku)
@@ -182,7 +182,7 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
   test('admin cannot update product into category and type conflict', async ({ testContext }) => {
     //given
-    const productForSkateWheelConflict = await createProduct(testContext, new ProductBuilder().build());
+    const productForSkateWheelConflict = await createRandomProduct(testContext);
 
     //when
     const skateWheelResponse = await testContext.api.admin.product.updateProduct(
@@ -191,7 +191,7 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
     );
 
     //given
-    const productForAccessoryFreeskateConflict = await createProduct(testContext, new ProductBuilder().build());
+    const productForAccessoryFreeskateConflict = await createRandomProduct(testContext);
 
     //when
     const accessoryFreeskateResponse = await testContext.api.admin.product.updateProduct(
@@ -243,6 +243,14 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
 async function createProduct(testContext: any, product: any) {
   const response = await testContext.api.admin.product.createProduct(product);
+
+  //then
+  expect(response.ok()).toBeTruthy();
+  return response.json();
+}
+
+async function createRandomProduct(testContext: any, overrides = {}) {
+  const response = await testContext.api.admin.product.createRandom(overrides);
 
   //then
   expect(response.ok()).toBeTruthy();

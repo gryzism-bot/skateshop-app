@@ -1,13 +1,10 @@
 import { expect } from '@playwright/test';
-import { CartAPI } from '../../api/cart.api';
-import { ProductAPI } from '../../api/product.api';
 import { expectOrderToMatchCart, expectOrderToMatchCheckoutDetails } from '../../assertions/order.assertions';
-import { ProductBuilder } from '../../builders/product.builder';
 import { test } from '../../fixtures/ui.fixture';
 
 test.describe('cart UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
   test('client can add guest cart items to account cart after login', async ({
-    apiRequestContext,
+    api,
     freshClient,
     productPage
   }) => {
@@ -15,17 +12,12 @@ test.describe('cart UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
     await productPage.open();
     await productPage.addFirstAvailableProductToGuestCart();
 
-    //when
     await productPage.loginAndMergeGuestCartToAccount(freshClient.email, freshClient.password);
 
-    //then
     await productPage.expectCartItemCount(1);
 
-    //when
-    const userCartApi = new CartAPI(apiRequestContext, freshClient.token);
-    const cartBeforeCheckoutResponse = await userCartApi.getCart();
+    const cartBeforeCheckoutResponse = await api.cart.client.getCart();
 
-    //then
     expect(cartBeforeCheckoutResponse.ok()).toBeTruthy();
     const cartBeforeCheckout = await cartBeforeCheckoutResponse.json();
 
@@ -58,48 +50,36 @@ test.describe('cart UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
   });
 
   test('fresh client can order product added to account cart before login', async ({
-    apiRequestContext,
+    api,
     freshClient,
-    getTokenWorkerFixture,
     productPage
   }) => {
     //given
-    const adminToken = await getTokenWorkerFixture('admin');
-    const productApi = new ProductAPI(apiRequestContext, adminToken);
-    const productResponse = await productApi.createProduct(new ProductBuilder()
-      .withName(`Guest Before Login Skate ${Date.now()}`)
-      .withSku(`GUEST-BEFORE-LOGIN-${Date.now()}`)
-      .withPrice(280)
-      .withStock(3)
-      .build());
+    const productResponse = await api.product.admin.createRandom({
+      name: `Account Cart Before Login Skate ${Date.now()}`,
+      price: 280,
+      stock: 3
+    });
 
-    //then
     expect(productResponse.ok()).toBeTruthy();
     const product = await productResponse.json();
 
-    //when
-    const userCartApi = new CartAPI(apiRequestContext, freshClient.token);
-    const addToCartResponse = await userCartApi.addToCart(product.id, 1);
+    const addToCartResponse = await api.cart.client.addToCart(product.id, 1);
 
-    //then
     expect(addToCartResponse.ok()).toBeTruthy();
 
     //when
     await productPage.open();
     await productPage.loginAsClient(freshClient.email, freshClient.password);
 
-    //then
     await productPage.expectCartItemCount(1);
     await productPage.expectCartItemVisible(product.name);
 
-    //when
-    const cartBeforeCheckoutResponse = await userCartApi.getCart();
+    const cartBeforeCheckoutResponse = await api.cart.client.getCart();
 
-    //then
     expect(cartBeforeCheckoutResponse.ok()).toBeTruthy();
     const cartBeforeCheckout = await cartBeforeCheckoutResponse.json();
 
-    //when
     const checkoutModal = await productPage.startCheckout();
     const checkoutDetails = {
       contactEmail: freshClient.email,
@@ -128,71 +108,55 @@ test.describe('cart UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
   });
 
   test('fresh client can order account cart product with extra product added after login', async ({
-    apiRequestContext,
+    api,
     freshClient,
-    getTokenWorkerFixture,
     productPage
   }) => {
     //given
-    const adminToken = await getTokenWorkerFixture('admin');
-    const productApi = new ProductAPI(apiRequestContext, adminToken);
     const productSuffix = Date.now();
 
-    const guestProductResponse = await productApi.createProduct(new ProductBuilder()
-      .withName(`Guest Cart Skate ${productSuffix}`)
-      .withSku(`GUEST-CART-SKATE-${productSuffix}`)
-      .withPrice(280)
-      .withStock(3)
-      .build());
+    const guestProductResponse = await api.product.admin.createRandom({
+      name: `Account Cart Skate ${productSuffix}`,
+      price: 280,
+      stock: 3
+    });
 
-    //then
     expect(guestProductResponse.ok()).toBeTruthy();
     const guestProduct = await guestProductResponse.json();
 
-    const extraProductResponse = await productApi.createProduct(new ProductBuilder()
-      .withName(`Extra Cart Wheels ${productSuffix}`)
-      .withSku(`EXTRA-CART-WHEELS-${productSuffix}`)
-      .withCategory('ACCESSORIES')
-      .withType('WHEELS')
-      .withPrice(120)
-      .withStock(5)
-      .build());
+    const extraProductResponse = await api.product.admin.createRandom({
+      name: `Extra Cart Wheels ${productSuffix}`,
+      category: 'ACCESSORIES',
+      type: 'WHEELS',
+      price: 120,
+      stock: 5
+    });
 
-    //then
     expect(extraProductResponse.ok()).toBeTruthy();
     const extraProduct = await extraProductResponse.json();
 
-    //when
-    const userCartApi = new CartAPI(apiRequestContext, freshClient.token);
-    const addToCartResponse = await userCartApi.addToCart(guestProduct.id, 1);
+    const addToCartResponse = await api.cart.client.addToCart(guestProduct.id, 1);
 
-    //then
     expect(addToCartResponse.ok()).toBeTruthy();
 
     //when
     await productPage.open();
     await productPage.loginAsClient(freshClient.email, freshClient.password);
 
-    //then
     await productPage.expectCartItemCount(1);
     await productPage.expectCartItemVisible(guestProduct.name);
 
-    //when
     await productPage.addProductToCart(extraProduct.name);
 
-    //then
     await productPage.expectCartItemCount(2);
     await productPage.expectCartItemVisible(guestProduct.name);
     await productPage.expectCartItemVisible(extraProduct.name);
 
-    //when
-    const cartBeforeCheckoutResponse = await userCartApi.getCart();
+    const cartBeforeCheckoutResponse = await api.cart.client.getCart();
 
-    //then
     expect(cartBeforeCheckoutResponse.ok()).toBeTruthy();
     const cartBeforeCheckout = await cartBeforeCheckoutResponse.json();
 
-    //when
     const checkoutModal = await productPage.startCheckout();
     const checkoutDetails = {
       contactEmail: freshClient.email,

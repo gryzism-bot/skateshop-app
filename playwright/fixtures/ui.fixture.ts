@@ -1,4 +1,7 @@
 import { APIRequestContext, expect, request as playwrightRequest } from '@playwright/test';
+import { CartAPI } from '../api/cart.api';
+import { OrderAPI } from '../api/order.api';
+import { ProductAPI } from '../api/product.api';
 import { test as base } from './app.fixture';
 import { ProductPage } from '../pages/product.page';
 
@@ -9,6 +12,19 @@ type FreshClient = {
 };
 
 type UiFixtures = {
+  api: {
+    product: {
+      admin: ProductAPI;
+      client: ProductAPI;
+    };
+    cart: {
+      client: CartAPI;
+    };
+    order: {
+      admin: OrderAPI;
+      client: OrderAPI;
+    };
+  };
   apiRequestContext: APIRequestContext;
   freshClient: FreshClient;
   productPage: ProductPage;
@@ -49,6 +65,25 @@ export const test = base.extend<UiFixtures>({
       email,
       password,
       token: await loginResponse.text()
+    });
+  },
+
+  // Test-scoped: role-bound API clients for UI setup and backend assertions.
+  api: async ({ apiRequestContext, freshClient, getTokenWorkerFixture }, use) => {
+    const adminToken = await getTokenWorkerFixture('admin');
+
+    await use({
+      product: {
+        admin: new ProductAPI(apiRequestContext, adminToken),
+        client: new ProductAPI(apiRequestContext, freshClient.token)
+      },
+      cart: {
+        client: new CartAPI(apiRequestContext, freshClient.token)
+      },
+      order: {
+        admin: new OrderAPI(apiRequestContext, adminToken),
+        client: new OrderAPI(apiRequestContext, freshClient.token)
+      }
     });
   }
 });

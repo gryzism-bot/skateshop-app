@@ -1,46 +1,35 @@
 import { expect } from '@playwright/test';
-import { CartAPI } from '../../api/cart.api';
-import { OrderAPI } from '../../api/order.api';
-import { ProductAPI } from '../../api/product.api';
 import { expectOrderToMatchCart } from '../../assertions/order.assertions';
-import { ProductBuilder } from '../../builders/product.builder';
 import { test } from '../../fixtures/ui.fixture';
 
 test.describe('admin panel UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
   test('admin can mark paid order as sent from admin panel', async ({
-    apiRequestContext,
+    api,
     freshClient,
-    getTokenWorkerFixture,
     productPage
   }) => {
     //given
-    const adminToken = await getTokenWorkerFixture('admin');
-
-    const productApi = new ProductAPI(apiRequestContext, adminToken);
-    const createProductResponse = await productApi.createProduct(new ProductBuilder()
-      .withName(`Admin Panel Checkout Skate ${Date.now()}`)
-      .withSku(`ADMIN-PANEL-SKATE-${Date.now()}`)
-      .withPrice(300)
-      .withStock(4)
-      .build());
+    const createProductResponse = await api.product.admin.createRandom({
+      name: `Admin Panel Checkout Skate ${Date.now()}`,
+      price: 300,
+      stock: 4
+    });
 
     expect(createProductResponse.ok()).toBeTruthy();
     const product = await createProductResponse.json();
 
-    const userCartApi = new CartAPI(apiRequestContext, freshClient.token);
-    const addToCartResponse = await userCartApi.addToCart(product.id, 1);
+    const addToCartResponse = await api.cart.client.addToCart(product.id, 1);
 
     expect(addToCartResponse.ok()).toBeTruthy();
     const cartBeforeCheckout = await addToCartResponse.json();
 
-    const clientOrderApi = new OrderAPI(apiRequestContext, freshClient.token);
     const checkoutRequest = {
       contactEmail: freshClient.email,
       deliveryMethod: 'ADDRESS',
       deliveryAddress: 'Skate Street 10, Warsaw',
       paymentMethod: 'CARD'
     } as const;
-    const checkoutResponse = await clientOrderApi.checkout(checkoutRequest);
+    const checkoutResponse = await api.order.client.checkout(checkoutRequest);
 
     expect(checkoutResponse.ok()).toBeTruthy();
     const order = await checkoutResponse.json();
@@ -48,7 +37,7 @@ test.describe('admin panel UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
     expect(order.status).toBe('NEW');
     expectOrderToMatchCart(cartBeforeCheckout, order);
 
-    const payResponse = await clientOrderApi.pay(order.id);
+    const payResponse = await api.order.client.pay(order.id);
 
     expect(payResponse.ok()).toBeTruthy();
     const paidOrder = await payResponse.json();
@@ -65,8 +54,7 @@ test.describe('admin panel UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
 
     await adminPanel.expectOrderSent(order.id);
 
-    const adminOrderApi = new OrderAPI(apiRequestContext, adminToken);
-    const adminOrdersResponse = await adminOrderApi.getAdminOrders();
+    const adminOrdersResponse = await api.order.admin.getAdminOrders();
 
     expect(adminOrdersResponse.ok()).toBeTruthy();
     const adminOrders = await adminOrdersResponse.json();
