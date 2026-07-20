@@ -1,10 +1,6 @@
 # 🛹 SkateShop App
 
-A simple e-commerce back and frontend for a skate shop built with Spring Boot and Angular
-
-currently: tests in test.http, understanding and adding unit tests, Playwright api tests and ui init test
-
-https://youtube.com/shorts/ZAp0CHNlNBI?feature=share
+A simple e-commerce back and frontend for a skate shop built with Spring Boot and Angular to showcase Playwright framework
 
 ## 🚀 Features
 
@@ -22,9 +18,24 @@ cart, userless cart, merge userless browser cart to "real cart" button, checkout
 
 ## all made for Playwright framework showcase: 
 
-Business POM with Component Locator subtree, with page's locator functions, ProductBuilder, freshClient fixture, browserless login, textContext object in test fixture dependency chain, with nested getToken workerFixture for roles, with api client: admin's product and user's product/cart/order, only api and only ui tests command with test tags and --grep. Made as SO from SOLID as possible for scalability and openness. 
+config has: 
+- ui and api path specified projects
+- docker configuration
+- screenshot and video retency
+- expect timeout
 
-but backend is brought to early-commercial level in case of future use 
+fixtures injected:
+- freshClient user with random email
+- browserless login for freshClient
+- apiClient for admin and user to setup and teardown test data
+- worker token fixture
+
+tests receive: 
+- Business POMs with technical Component Locator subtree 
+- ProductBuilder
+- assertions
+
+backend is brought to early-commercial level in case of future use 
 
 npx playwright test --grep @suite-api
 npx playwright test --grep @suite-ui
