@@ -1,4 +1,4 @@
-import { APIRequestContext } from '@playwright/test';
+import { APIRequestContext, Page } from '@playwright/test';
 
 type CheckoutRequest = {
   promoCode?: string;
@@ -50,4 +50,16 @@ export class OrderAPI {
       Authorization: `Bearer ${this.token}`
     };
   }
+}
+
+export function waitForOrderPresent(page: Page) {
+  return page.waitForResponse(response =>
+    response.url().includes('/api/orders') && response.request().method() === 'POST'
+  );
+}
+
+export function waitForPayOrderResponse(page: Page, orderId: number) {
+  return page.waitForResponse(response =>
+    response.url().includes(`/api/orders/${orderId}/pay`) && response.request().method() === 'POST'
+  );
 }

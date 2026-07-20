@@ -1,4 +1,5 @@
 import { expect, Page } from '@playwright/test';
+import { waitForOrderPresent, waitForPayOrderResponse } from '../api/order.api';
 
 type CheckoutDetails = {
   contactEmail: string;
@@ -25,9 +26,7 @@ export class CheckoutModalComponent {
     await this.deliveryAddressInput.fill(details.deliveryAddress);
     await this.paymentOption(details.paymentMethod).check();
 
-    const checkoutResponsePromise = this.page.waitForResponse(response =>
-      response.url().includes('/api/orders') && response.request().method() === 'POST'
-    );
+    const checkoutResponsePromise = waitForOrderPresent(this.page);
     await this.placeOrderButton.click();
     const checkoutResponse = await checkoutResponsePromise;
     expect(checkoutResponse.ok()).toBeTruthy();
@@ -39,9 +38,7 @@ export class CheckoutModalComponent {
   }
 
   async payOrder(orderId: number) {
-    const payResponsePromise = this.page.waitForResponse(response =>
-      response.url().includes(`/api/orders/${orderId}/pay`) && response.request().method() === 'POST'
-    );
+    const payResponsePromise = waitForPayOrderResponse(this.page, orderId);
     await this.mockPayButton.click();
     const payResponse = await payResponsePromise;
     expect(payResponse.ok()).toBeTruthy();

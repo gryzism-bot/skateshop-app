@@ -38,6 +38,12 @@ export class ProductPage {
     await this.account.expectLoggedIn();
   }
 
+  async loginAsClient(email: string, password: string) {
+    await this.account.login(email, password);
+    await this.account.expectLoggedIn();
+    await this.cart.expectAccountCart();
+  }
+
   async addFirstAvailableProductToGuestCart() {
     await this.cart.expectGuestCart();
     await this.catalog.addFirstProductToCart();
@@ -98,6 +104,10 @@ export class ProductPage {
 
   async expectCartItemVisible(productName: string) {
     await this.cart.expectItemVisible(productName);
+  }
+
+  async expectCartItemCount(quantity: number) {
+    await this.cart.expectItemCount(quantity);
   }
 
   async startCheckout() {

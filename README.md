@@ -31,7 +31,7 @@ fixtures injected:
 - worker token fixture
 
 tests receive: 
-- Business POMs with technical Component Locator subtree 
+- Business POMs with technical Component Locator subtree, with api returns for business processes for wait and assert
 - ProductBuilder
 - assertions
 

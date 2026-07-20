@@ -11,6 +11,7 @@ test.describe('checkout UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
     getTokenWorkerFixture,
     productPage
   }) => {
+    //given
     const adminToken = await getTokenWorkerFixture('admin');
 
     const skate = await createProduct(apiRequestContext, adminToken, new ProductBuilder()
@@ -32,16 +33,26 @@ test.describe('checkout UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
       .withStock(6)
       .build());
 
+    //when
     await productPage.openAsLoggedClient(freshClient.token);
+
+    //then
     await productPage.expectProductsVisible([skate.name, accessory.name]);
 
+    //when
     await productPage.hideSkates();
+
+    //then
     await productPage.expectSkatesHidden(skate.name);
     await productPage.expectProductVisible(accessory.name);
 
+    //when
     await productPage.hideAccessories();
+
+    //then
     await productPage.expectCatalogEmpty();
 
+    //when
     await productPage.showSkates();
     await productPage.addProductToCart(skate.name);
 
@@ -53,6 +64,7 @@ test.describe('checkout UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
     });
     const paidOrder = await checkoutModal.payOrder(order.id);
 
+    //then
     expect(paidOrder.status).toBe('PAID');
   });
 });
@@ -65,6 +77,7 @@ async function createProduct(api: APIRequestContext, token: string, product: any
     data: product
   });
 
+  //then
   expect(response.ok()).toBeTruthy();
   return response.json();
 }
