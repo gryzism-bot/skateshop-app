@@ -30,12 +30,14 @@ import com.mateoosz.portfolio.backend.model.Product;
 import com.mateoosz.portfolio.backend.model.User;
 import com.mateoosz.portfolio.backend.repository.CartRepository;
 import com.mateoosz.portfolio.backend.repository.OrderRepository;
+import com.mateoosz.portfolio.backend.repository.ProductRepository;
 import com.mateoosz.portfolio.backend.repository.UserRepository;
 
 class OrderServiceTest {
 
     private OrderRepository orderRepository;
     private CartRepository cartRepository;
+    private ProductRepository productRepository;
     private UserRepository userRepository;
 
     private OrderService orderService;
@@ -44,11 +46,13 @@ class OrderServiceTest {
     void setUp() {
         orderRepository = mock(OrderRepository.class);
         cartRepository = mock(CartRepository.class);
+        productRepository = mock(ProductRepository.class);
         userRepository = mock(UserRepository.class);
 
         orderService = new OrderService(
                 orderRepository,
                 cartRepository,
+                productRepository,
                 userRepository
         );
 
@@ -131,6 +135,46 @@ class OrderServiceTest {
 
         assertThat(cart.getItems()).isEmpty();
         verify(cartRepository).save(cart);
+    }
+
+    @Test
+    void shouldDecreaseProductStockAfterCreatingOrder() {
+        User user = user();
+        Product product = product(100);
+        product.setStock(5);
+        Cart cart = cart(user, cartItem(product, 2));
+
+        mockCurrentUserAndCart(user, cart);
+
+        when(orderRepository.save(any(Order.class)))
+                .thenAnswer(i -> i.getArgument(0));
+        when(productRepository.save(product)).thenReturn(product);
+
+        orderService.createOrder(checkoutRequest());
+
+        assertThat(product.getStock()).isEqualTo(3);
+        assertThat(product.isActive()).isTrue();
+        verify(productRepository).save(product);
+    }
+
+    @Test
+    void shouldDeactivateProductWhenOrderConsumesWholeStock() {
+        User user = user();
+        Product product = product(100);
+        product.setStock(2);
+        Cart cart = cart(user, cartItem(product, 2));
+
+        mockCurrentUserAndCart(user, cart);
+
+        when(orderRepository.save(any(Order.class)))
+                .thenAnswer(i -> i.getArgument(0));
+        when(productRepository.save(product)).thenReturn(product);
+
+        orderService.createOrder(checkoutRequest());
+
+        assertThat(product.getStock()).isZero();
+        assertThat(product.isActive()).isFalse();
+        verify(productRepository).save(product);
     }
 
     @Test
@@ -327,6 +371,8 @@ class OrderServiceTest {
     private Product product(double price) {
         Product product = new Product();
         product.setPrice(price);
+        product.setStock(10);
+        product.setActive(true);
         return product;
     }
 

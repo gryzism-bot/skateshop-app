@@ -147,6 +147,82 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
     //then
     expect(emptyCartAfterSecondOrder.items).toEqual([]);
   });
+
+  test('checkout decreases product stock by ordered quantity', async ({ testContext, freshApiClient }) => {
+    //given
+    const initialStock = 5;
+    const orderedQuantity = 2;
+    const product = await createRandomProduct(testContext, {
+      name: `Stock Lowering Skate ${Date.now()}`,
+      price: 260,
+      stock: initialStock
+    });
+
+    const addToCartResponse = await freshApiClient.cart.addToCart(product.id, orderedQuantity);
+
+    //then
+    expect(addToCartResponse.ok()).toBeTruthy();
+
+    //when
+    const checkoutResponse = await freshApiClient.order.checkout({
+      contactEmail: freshApiClient.email,
+      deliveryMethod: 'ADDRESS',
+      deliveryAddress: 'Stock Street 3, Warsaw',
+      paymentMethod: 'CARD'
+    });
+
+    //then
+    expect(checkoutResponse.ok()).toBeTruthy();
+
+    //when
+    const productAfterCheckoutResponse = await testContext.api.admin.product.getById(product.id);
+
+    //then
+    expect(productAfterCheckoutResponse.ok()).toBeTruthy();
+    const productAfterCheckout = await productAfterCheckoutResponse.json();
+
+    expect(productAfterCheckout.id).toBe(product.id);
+    expect(productAfterCheckout.stock).toBe(initialStock - orderedQuantity);
+    expect(productAfterCheckout.active).toBe(true);
+  });
+
+  test('checkout deactivates product when ordered quantity consumes whole stock', async ({ testContext, freshApiClient }) => {
+    //given
+    const initialStock = 2;
+    const orderedQuantity = 2;
+    const product = await createRandomProduct(testContext, {
+      name: `Stock Depleted Skate ${Date.now()}`,
+      price: 260,
+      stock: initialStock
+    });
+
+    const addToCartResponse = await freshApiClient.cart.addToCart(product.id, orderedQuantity);
+
+    //then
+    expect(addToCartResponse.ok()).toBeTruthy();
+
+    //when
+    const checkoutResponse = await freshApiClient.order.checkout({
+      contactEmail: freshApiClient.email,
+      deliveryMethod: 'ADDRESS',
+      deliveryAddress: 'Stock Street 4, Warsaw',
+      paymentMethod: 'CARD'
+    });
+
+    //then
+    expect(checkoutResponse.ok()).toBeTruthy();
+
+    //when
+    const productAfterCheckoutResponse = await testContext.api.admin.product.getById(product.id);
+
+    //then
+    expect(productAfterCheckoutResponse.ok()).toBeTruthy();
+    const productAfterCheckout = await productAfterCheckoutResponse.json();
+
+    expect(productAfterCheckout.id).toBe(product.id);
+    expect(productAfterCheckout.stock).toBe(0);
+    expect(productAfterCheckout.active).toBe(false);
+  });
 });
 
 async function createRandomProduct(testContext: any, overrides: any) {

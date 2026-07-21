@@ -17,6 +17,7 @@ import com.mateoosz.portfolio.backend.model.OrderStatus;
 import com.mateoosz.portfolio.backend.model.User;
 import com.mateoosz.portfolio.backend.repository.CartRepository;
 import com.mateoosz.portfolio.backend.repository.OrderRepository;
+import com.mateoosz.portfolio.backend.repository.ProductRepository;
 import com.mateoosz.portfolio.backend.repository.UserRepository;
 import com.mateoosz.portfolio.backend.security.SecurityUtils;
 
@@ -28,13 +29,16 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
+    private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
     public OrderService(OrderRepository orderRepository,
                         CartRepository cartRepository,
+                        ProductRepository productRepository,
                         UserRepository userRepository) {
         this.orderRepository = orderRepository;
         this.cartRepository = cartRepository;
+        this.productRepository = productRepository;
         this.userRepository = userRepository;
     }
 
@@ -50,8 +54,8 @@ public class OrderService {
 
         Order order = buildOrder(user, cart, request);
 
+        decreaseStock(cart);
         Order savedOrder = orderRepository.save(order);
-
         clearCart(cart);
 
         return savedOrder;
@@ -220,5 +224,24 @@ public class OrderService {
     private void clearCart(Cart cart) {
         cart.getItems().clear();
         cartRepository.save(cart);
+    }
+
+    private void decreaseStock(Cart cart) {
+        for (CartItem item : cart.getItems()) {
+            var product = item.getProduct();
+            int stockAfterOrder = product.getStock() - item.getQuantity();
+
+            if (stockAfterOrder < 0) {
+                throw new IllegalArgumentException("Product stock is too low");
+            }
+
+            product.setStock(stockAfterOrder);
+
+            if (stockAfterOrder == 0) {
+                product.setActive(false);
+            }
+
+            productRepository.save(product);
+        }
     }
 }
