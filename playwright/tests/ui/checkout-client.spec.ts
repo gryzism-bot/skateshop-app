@@ -18,7 +18,7 @@ test.describe('checkout UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
       stock: 4
     });
 
-    expect(skateResponse.ok()).toBeTruthy();
+    expect(skateResponse.status()).toBe(200);
     const skate = await skateResponse.json();
 
     const accessoryResponse = await api.product.admin.createRandom({
@@ -30,7 +30,7 @@ test.describe('checkout UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
       stock: 6
     });
 
-    expect(accessoryResponse.ok()).toBeTruthy();
+    expect(accessoryResponse.status()).toBe(200);
     const accessory = await accessoryResponse.json();
 
     await productPage.openAsLoggedClient(freshClient.token);

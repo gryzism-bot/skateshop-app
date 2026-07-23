@@ -15,12 +15,12 @@ test.describe('admin panel UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
       stock: 4
     });
 
-    expect(createProductResponse.ok()).toBeTruthy();
+    expect(createProductResponse.status()).toBe(200);
     const product = await createProductResponse.json();
 
     const addToCartResponse = await api.cart.client.addToCart(product.id, 1);
 
-    expect(addToCartResponse.ok()).toBeTruthy();
+    expect(addToCartResponse.status()).toBe(200);
     const cartBeforeCheckout = await addToCartResponse.json();
 
     const checkoutRequest = {
@@ -31,7 +31,7 @@ test.describe('admin panel UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
     } as const;
     const checkoutResponse = await api.order.client.checkout(checkoutRequest);
 
-    expect(checkoutResponse.ok()).toBeTruthy();
+    expect(checkoutResponse.status()).toBe(200);
     const order = await checkoutResponse.json();
 
     expect(order.status).toBe('NEW');
@@ -39,7 +39,7 @@ test.describe('admin panel UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
 
     const payResponse = await api.order.client.pay(order.id);
 
-    expect(payResponse.ok()).toBeTruthy();
+    expect(payResponse.status()).toBe(200);
     const paidOrder = await payResponse.json();
 
     //when
@@ -56,7 +56,7 @@ test.describe('admin panel UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
 
     const adminOrdersResponse = await api.order.admin.getAdminOrders();
 
-    expect(adminOrdersResponse.ok()).toBeTruthy();
+    expect(adminOrdersResponse.status()).toBe(200);
     const adminOrders = await adminOrdersResponse.json();
     const sentAdminOrder = adminOrders.find((adminOrder: any) => adminOrder.id === order.id);
 

@@ -60,7 +60,7 @@ export function expectOrderToMatchCart(cart: CartResponse, checkoutOrder: OrderR
     const orderItem = order.items.find(item => item.product.id === cartItem.productId);
 
     //then
-    expect(orderItem).toBeTruthy();
+    expect(orderItem).toBeDefined();
     expect(orderItem?.product.id).toBe(cartItem.productId);
     expect(orderItem?.product.name).toBe(cartItem.productName);
     expect(orderItem?.product.price).toBe(cartItem.productPrice);

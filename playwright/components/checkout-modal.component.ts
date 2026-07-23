@@ -29,7 +29,7 @@ export class CheckoutModalComponent {
     const checkoutResponsePromise = waitForOrderPresent(this.page);
     await this.placeOrderButton.click();
     const checkoutResponse = await checkoutResponsePromise;
-    expect(checkoutResponse.ok()).toBeTruthy();
+    expect(checkoutResponse.status()).toBe(200);
     const order = await checkoutResponse.json();
     expect(order.status).toBe('NEW');
 
@@ -41,7 +41,7 @@ export class CheckoutModalComponent {
     const payResponsePromise = waitForPayOrderResponse(this.page, orderId);
     await this.mockPayButton.click();
     const payResponse = await payResponsePromise;
-    expect(payResponse.ok()).toBeTruthy();
+    expect(payResponse.status()).toBe(200);
     const paidOrder = await payResponse.json();
 
     expect(paidOrder.id).toBe(orderId);

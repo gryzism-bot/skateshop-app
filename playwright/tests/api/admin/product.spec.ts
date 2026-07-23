@@ -18,7 +18,7 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const response = await testContext.api.admin.product.createProduct(product);
 
     //then
-    expect(response.ok()).toBeTruthy();
+    expect(response.status()).toBe(200);
 
     const body = await response.json();
 
@@ -65,7 +65,7 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const response = await testContext.api.admin.product.updateProduct(createdProduct.id, update);
 
     //then
-    expect(response.ok()).toBeTruthy();
+    expect(response.status()).toBe(200);
 
     const body = await response.json();
 
@@ -84,7 +84,7 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const suffix = ` [pw-${Date.now().toString(36)}]`;
 
     //then
-    expect(firstSkate).toBeTruthy();
+    expect(firstSkate).toBeDefined();
 
     //given
     const update = {
@@ -96,7 +96,7 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const response = await testContext.api.admin.product.updateProduct(firstSkate.id, update);
 
     //then
-    expect(response.ok()).toBeTruthy();
+    expect(response.status()).toBe(200);
 
     const body = await response.json();
 
@@ -171,7 +171,7 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const response = await testContext.api.admin.product.updateProduct(createdProduct.id, update);
 
     //then
-    expect(response.ok()).toBeTruthy();
+    expect(response.status()).toBe(200);
 
     const body = await response.json();
 
@@ -231,7 +231,7 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const response = await testContext.api.admin.product.createProduct(product);
 
     //then
-    expect(response.ok()).toBeTruthy();
+    expect(response.status()).toBe(200);
 
     const body = await response.json();
 
@@ -245,7 +245,7 @@ async function createProduct(testContext: any, product: any) {
   const response = await testContext.api.admin.product.createProduct(product);
 
   //then
-  expect(response.ok()).toBeTruthy();
+  expect(response.status()).toBe(200);
   return response.json();
 }
 
@@ -253,7 +253,7 @@ async function createRandomProduct(testContext: any, overrides = {}) {
   const response = await testContext.api.admin.product.createRandom(overrides);
 
   //then
-  expect(response.ok()).toBeTruthy();
+  expect(response.status()).toBe(200);
   return response.json();
 }
 

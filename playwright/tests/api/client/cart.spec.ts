@@ -14,7 +14,7 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const addToCartResponse = await testContext.api.client.cart.addToCart(product.id, 1);
 
     //then
-    expect(addToCartResponse.ok()).toBeTruthy();
+    expect(addToCartResponse.status()).toBe(200);
     const cartBeforeCheckout = await addToCartResponse.json();
 
     //then
@@ -32,14 +32,14 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const checkoutResponse = await testContext.api.client.order.checkout(checkoutDetails);
 
     //then
-    expect(checkoutResponse.ok()).toBeTruthy();
+    expect(checkoutResponse.status()).toBe(200);
     const order = await checkoutResponse.json();
 
     //when
     const payResponse = await testContext.api.client.order.pay(order.id);
 
     //then
-    expect(payResponse.ok()).toBeTruthy();
+    expect(payResponse.status()).toBe(200);
     const paidOrder = await payResponse.json();
 
     //then
@@ -61,13 +61,13 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const addToCartResponse = await freshApiClient.cart.addToCart(product.id, 1);
 
     //then
-    expect(addToCartResponse.ok()).toBeTruthy();
+    expect(addToCartResponse.status()).toBe(200);
 
     //when
     const cartBeforeCheckoutResponse = await freshApiClient.cart.getCart();
 
     //then
-    expect(cartBeforeCheckoutResponse.ok()).toBeTruthy();
+    expect(cartBeforeCheckoutResponse.status()).toBe(200);
     const cartBeforeCheckout = await cartBeforeCheckoutResponse.json();
 
     //then
@@ -85,14 +85,14 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const checkoutResponse = await freshApiClient.order.checkout(checkoutDetails);
 
     //then
-    expect(checkoutResponse.ok()).toBeTruthy();
+    expect(checkoutResponse.status()).toBe(200);
     const order = await checkoutResponse.json();
 
     //when
     const payResponse = await freshApiClient.order.pay(order.id);
 
     //then
-    expect(payResponse.ok()).toBeTruthy();
+    expect(payResponse.status()).toBe(200);
     const paidOrder = await payResponse.json();
 
     //then
@@ -125,13 +125,13 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const addAccountProductResponse = await freshApiClient.cart.addToCart(accountProduct.id, 1);
 
     //then
-    expect(addAccountProductResponse.ok()).toBeTruthy();
+    expect(addAccountProductResponse.status()).toBe(200);
 
     //when
     const oneItemCartResponse = await freshApiClient.cart.getCart();
 
     //then
-    expect(oneItemCartResponse.ok()).toBeTruthy();
+    expect(oneItemCartResponse.status()).toBe(200);
     const oneItemCart = await oneItemCartResponse.json();
 
     //then
@@ -143,13 +143,13 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const addExtraProductResponse = await freshApiClient.cart.addToCart(extraProduct.id, 1);
 
     //then
-    expect(addExtraProductResponse.ok()).toBeTruthy();
+    expect(addExtraProductResponse.status()).toBe(200);
 
     //when
     const cartBeforeCheckoutResponse = await freshApiClient.cart.getCart();
 
     //then
-    expect(cartBeforeCheckoutResponse.ok()).toBeTruthy();
+    expect(cartBeforeCheckoutResponse.status()).toBe(200);
     const cartBeforeCheckout = await cartBeforeCheckoutResponse.json();
 
     //then
@@ -168,14 +168,14 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const checkoutResponse = await freshApiClient.order.checkout(checkoutDetails);
 
     //then
-    expect(checkoutResponse.ok()).toBeTruthy();
+    expect(checkoutResponse.status()).toBe(200);
     const order = await checkoutResponse.json();
 
     //when
     const payResponse = await freshApiClient.order.pay(order.id);
 
     //then
-    expect(payResponse.ok()).toBeTruthy();
+    expect(payResponse.status()).toBe(200);
     const paidOrder = await payResponse.json();
 
     //then
@@ -191,7 +191,7 @@ async function createRandomProduct(testContext: any, overrides: any) {
   const response = await testContext.api.admin.product.createRandom(overrides);
 
   //then
-  expect(response.ok()).toBeTruthy();
+  expect(response.status()).toBe(200);
   return response.json();
 }
 
@@ -202,7 +202,7 @@ function expectCartToContainProducts(cart: any, expectedItems: Array<{ product: 
   for (const expectedItem of expectedItems) {
     const cartItem = cart.items.find((item: any) => item.productId === expectedItem.product.id);
 
-    expect(cartItem).toBeTruthy();
+    expect(cartItem).toBeDefined();
     expect(cartItem.productName).toBe(expectedItem.product.name);
     expect(cartItem.productPrice).toBe(expectedItem.product.price);
     expect(cartItem.quantity).toBe(expectedItem.quantity);

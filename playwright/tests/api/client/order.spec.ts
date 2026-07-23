@@ -11,12 +11,12 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
       stock: 5
     });
 
-    expect(createProductResponse.ok()).toBeTruthy();
+    expect(createProductResponse.status()).toBe(200);
     const createdProduct = await createProductResponse.json();
 
     const addToCartResponse = await testContext.api.client.cart.addToCart(createdProduct.id, 2);
 
-    expect(addToCartResponse.ok()).toBeTruthy();
+    expect(addToCartResponse.status()).toBe(200);
     const cartBeforeCheckout = await addToCartResponse.json();
 
     const checkoutResponse = await testContext.api.client.order.checkout({
@@ -27,7 +27,7 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
       paymentMethod: 'CARD'
     });
 
-    expect(checkoutResponse.ok()).toBeTruthy();
+    expect(checkoutResponse.status()).toBe(200);
     const order = await checkoutResponse.json();
 
     expect(order.status).toBe('NEW');
@@ -40,7 +40,7 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
     //when
     const payResponse = await testContext.api.client.order.pay(order.id);
 
-    expect(payResponse.ok()).toBeTruthy();
+    expect(payResponse.status()).toBe(200);
     const paidOrder = await payResponse.json();
 
     expect(paidOrder.status).toBe('PAID');
@@ -48,7 +48,7 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
     const cartResponse = await testContext.api.client.cart.getCart();
 
-    expect(cartResponse.ok()).toBeTruthy();
+    expect(cartResponse.status()).toBe(200);
     const cart = await cartResponse.json();
 
     //then
@@ -70,7 +70,7 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
     const firstAddToCartResponse = await freshApiClient.cart.addToCart(firstProduct.id, 1);
 
-    expect(firstAddToCartResponse.ok()).toBeTruthy();
+    expect(firstAddToCartResponse.status()).toBe(200);
     const cartBeforeFirstOrder = await firstAddToCartResponse.json();
 
     const firstCheckoutResponse = await freshApiClient.order.checkout({
@@ -80,7 +80,7 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
       paymentMethod: 'CARD'
     });
 
-    expect(firstCheckoutResponse.ok()).toBeTruthy();
+    expect(firstCheckoutResponse.status()).toBe(200);
     const firstOrder = await firstCheckoutResponse.json();
 
     expect(firstOrder.status).toBe('NEW');
@@ -88,7 +88,7 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
     const firstPayResponse = await freshApiClient.order.pay(firstOrder.id);
 
-    expect(firstPayResponse.ok()).toBeTruthy();
+    expect(firstPayResponse.status()).toBe(200);
     const firstPaidOrder = await firstPayResponse.json();
 
     expect(firstPaidOrder.status).toBe('PAID');
@@ -97,19 +97,19 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
     //when
     const emptyCartAfterFirstOrderResponse = await freshApiClient.cart.getCart();
 
-    expect(emptyCartAfterFirstOrderResponse.ok()).toBeTruthy();
+    expect(emptyCartAfterFirstOrderResponse.status()).toBe(200);
     const emptyCartAfterFirstOrder = await emptyCartAfterFirstOrderResponse.json();
 
     expect(emptyCartAfterFirstOrder.items).toEqual([]);
 
     const secondAddToCartResponse = await freshApiClient.cart.addToCart(secondProduct.id, 2);
 
-    expect(secondAddToCartResponse.ok()).toBeTruthy();
+    expect(secondAddToCartResponse.status()).toBe(200);
     const cartAfterSecondAdd = await secondAddToCartResponse.json();
 
     const cartBeforeSecondOrderResponse = await freshApiClient.cart.getCart();
 
-    expect(cartBeforeSecondOrderResponse.ok()).toBeTruthy();
+    expect(cartBeforeSecondOrderResponse.status()).toBe(200);
     const cartBeforeSecondOrder = await cartBeforeSecondOrderResponse.json();
 
     expect(cartBeforeSecondOrder.items).toHaveLength(1);
@@ -124,7 +124,7 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
       paymentMethod: 'BLIK'
     });
 
-    expect(secondCheckoutResponse.ok()).toBeTruthy();
+    expect(secondCheckoutResponse.status()).toBe(200);
     const secondOrder = await secondCheckoutResponse.json();
 
     expect(secondOrder.id).not.toBe(firstOrder.id);
@@ -133,7 +133,7 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
     const secondPayResponse = await freshApiClient.order.pay(secondOrder.id);
 
-    expect(secondPayResponse.ok()).toBeTruthy();
+    expect(secondPayResponse.status()).toBe(200);
     const secondPaidOrder = await secondPayResponse.json();
 
     expect(secondPaidOrder.status).toBe('PAID');
@@ -141,7 +141,7 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
     const emptyCartAfterSecondOrderResponse = await freshApiClient.cart.getCart();
 
-    expect(emptyCartAfterSecondOrderResponse.ok()).toBeTruthy();
+    expect(emptyCartAfterSecondOrderResponse.status()).toBe(200);
     const emptyCartAfterSecondOrder = await emptyCartAfterSecondOrderResponse.json();
 
     //then
@@ -161,7 +161,7 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const addToCartResponse = await freshApiClient.cart.addToCart(product.id, orderedQuantity);
 
     //then
-    expect(addToCartResponse.ok()).toBeTruthy();
+    expect(addToCartResponse.status()).toBe(200);
 
     //when
     const checkoutResponse = await freshApiClient.order.checkout({
@@ -172,13 +172,13 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
     });
 
     //then
-    expect(checkoutResponse.ok()).toBeTruthy();
+    expect(checkoutResponse.status()).toBe(200);
 
     //when
     const productAfterCheckoutResponse = await testContext.api.admin.product.getById(product.id);
 
     //then
-    expect(productAfterCheckoutResponse.ok()).toBeTruthy();
+    expect(productAfterCheckoutResponse.status()).toBe(200);
     const productAfterCheckout = await productAfterCheckoutResponse.json();
 
     expect(productAfterCheckout.id).toBe(product.id);
@@ -199,7 +199,7 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const addToCartResponse = await freshApiClient.cart.addToCart(product.id, orderedQuantity);
 
     //then
-    expect(addToCartResponse.ok()).toBeTruthy();
+    expect(addToCartResponse.status()).toBe(200);
 
     //when
     const checkoutResponse = await freshApiClient.order.checkout({
@@ -210,13 +210,13 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
     });
 
     //then
-    expect(checkoutResponse.ok()).toBeTruthy();
+    expect(checkoutResponse.status()).toBe(200);
 
     //when
     const productAfterCheckoutResponse = await testContext.api.admin.product.getById(product.id);
 
     //then
-    expect(productAfterCheckoutResponse.ok()).toBeTruthy();
+    expect(productAfterCheckoutResponse.status()).toBe(200);
     const productAfterCheckout = await productAfterCheckoutResponse.json();
 
     expect(productAfterCheckout.id).toBe(product.id);
@@ -229,6 +229,6 @@ async function createRandomProduct(testContext: any, overrides: any) {
   const response = await testContext.api.admin.product.createRandom(overrides);
 
   //then
-  expect(response.ok()).toBeTruthy();
+  expect(response.status()).toBe(200);
   return response.json();
 }

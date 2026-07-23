@@ -54,12 +54,12 @@ export const test = base.extend<UiFixtures>({
     const registerResponse = await apiRequestContext.post('/api/auth/register', {
       data: { email, password }
     });
-    expect(registerResponse.ok()).toBeTruthy();
+    expect(registerResponse.status()).toBe(200);
 
     const loginResponse = await apiRequestContext.post('/api/auth/login', {
       data: { email, password }
     });
-    expect(loginResponse.ok()).toBeTruthy();
+    expect(loginResponse.status()).toBe(200);
 
     await use({
       email,
