@@ -33,7 +33,7 @@ fixtures injected:
 tests receive: 
 - Business POMs with technical Component Locator subtree, with api returns for business processes for wait and assert
 - ProductBuilder
-- assertions
+- assertions and assertions on responses
 
 backend is brought to early-commercial level in case of future use 
 

@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { expectOkProductResponse } from '../../assertions/api-response.assertions';
 import { test } from '../../fixtures/ui.fixture';
 
 const wheelsImageUrl = 'https://cdn.bladeville.pl/media/catalog/product/i/m/img_2147.jpg';
@@ -18,8 +19,12 @@ test.describe('checkout UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
       stock: 4
     });
 
-    expect(skateResponse.status()).toBe(200);
-    const skate = await skateResponse.json();
+    const skate = await expectOkProductResponse(skateResponse, {
+      category: 'SKATES',
+      type: 'FREESKATE',
+      price: 300,
+      stock: 4
+    });
 
     const accessoryResponse = await api.product.admin.createRandom({
       name: `UI Checkout Wheels ${Date.now()}`,
@@ -30,8 +35,12 @@ test.describe('checkout UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
       stock: 6
     });
 
-    expect(accessoryResponse.status()).toBe(200);
-    const accessory = await accessoryResponse.json();
+    const accessory = await expectOkProductResponse(accessoryResponse, {
+      category: 'ACCESSORIES',
+      type: 'WHEELS',
+      price: 120,
+      stock: 6
+    });
 
     await productPage.openAsLoggedClient(freshClient.token);
 

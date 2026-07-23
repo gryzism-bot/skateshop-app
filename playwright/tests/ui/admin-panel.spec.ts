@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { expectOkAdminOrdersResponse, expectOkCartResponse, expectOkOrderResponse, expectOkProductResponse } from '../../assertions/api-response.assertions';
 import { expectOrderToMatchCart } from '../../assertions/order.assertions';
 import { test } from '../../fixtures/ui.fixture';
 
@@ -15,13 +16,16 @@ test.describe('admin panel UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
       stock: 4
     });
 
-    expect(createProductResponse.status()).toBe(200);
-    const product = await createProductResponse.json();
+    const product = await expectOkProductResponse(createProductResponse, {
+      price: 300,
+      stock: 4
+    });
 
     const addToCartResponse = await api.cart.client.addToCart(product.id, 1);
 
-    expect(addToCartResponse.status()).toBe(200);
-    const cartBeforeCheckout = await addToCartResponse.json();
+    const cartBeforeCheckout = await expectOkCartResponse(addToCartResponse, [
+      { product, quantity: 1 }
+    ]);
 
     const checkoutRequest = {
       contactEmail: freshClient.email,
@@ -31,16 +35,21 @@ test.describe('admin panel UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
     } as const;
     const checkoutResponse = await api.order.client.checkout(checkoutRequest);
 
-    expect(checkoutResponse.status()).toBe(200);
-    const order = await checkoutResponse.json();
+    const order = await expectOkOrderResponse(checkoutResponse, {
+      status: 'NEW',
+      ...checkoutRequest
+    });
 
     expect(order.status).toBe('NEW');
     expectOrderToMatchCart(cartBeforeCheckout, order);
 
     const payResponse = await api.order.client.pay(order.id);
 
-    expect(payResponse.status()).toBe(200);
-    const paidOrder = await payResponse.json();
+    const paidOrder = await expectOkOrderResponse(payResponse, {
+      id: order.id,
+      status: 'PAID',
+      ...checkoutRequest
+    });
 
     //when
     expect(paidOrder.status).toBe('PAID');
@@ -56,8 +65,7 @@ test.describe('admin panel UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
 
     const adminOrdersResponse = await api.order.admin.getAdminOrders();
 
-    expect(adminOrdersResponse.status()).toBe(200);
-    const adminOrders = await adminOrdersResponse.json();
+    const adminOrders = await expectOkAdminOrdersResponse(adminOrdersResponse);
     const sentAdminOrder = adminOrders.find((adminOrder: any) => adminOrder.id === order.id);
 
     //then

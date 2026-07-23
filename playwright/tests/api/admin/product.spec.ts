@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { expectOkProductListResponse, expectOkProductResponse } from '../../../assertions/api-response.assertions';
 import { ProductBuilder, ProductCategory, ProductType } from '../../../builders/product.builder';
 import { test } from '../../../fixtures/app.fixture';
 
@@ -18,9 +19,7 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const response = await testContext.api.admin.product.createProduct(product);
 
     //then
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
+    const body = await expectOkProductResponse(response, product);
 
     //then
     expect(body.name).toBe(product.name);
@@ -65,9 +64,12 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const response = await testContext.api.admin.product.updateProduct(createdProduct.id, update);
 
     //then
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
+    const body = await expectOkProductResponse(response, {
+      id: createdProduct.id,
+      name: update.name,
+      price: update.price,
+      stock: update.stock
+    });
 
     //then
     expect(body.id).toBe(createdProduct.id);
@@ -79,7 +81,7 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
   test('admin can rename first skate from product list', async ({ testContext }) => {
     //given
     const listResponse = await testContext.api.admin.product.getAll();
-    const products = await listResponse.json();
+    const products = await expectOkProductListResponse(listResponse);
     const firstSkate = products.find((product: any) => product.category === 'SKATES');
     const suffix = ` [pw-${Date.now().toString(36)}]`;
 
@@ -96,9 +98,10 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const response = await testContext.api.admin.product.updateProduct(firstSkate.id, update);
 
     //then
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
+    const body = await expectOkProductResponse(response, {
+      id: firstSkate.id,
+      name: update.name
+    });
 
     //then
     expect(body.name).toContain(suffix);
@@ -171,13 +174,11 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const response = await testContext.api.admin.product.updateProduct(createdProduct.id, update);
 
     //then
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
-
-    //then
-    expect(body.category).toBe('ACCESSORIES');
-    expect(body.type).toBe('WHEELS');
+    await expectOkProductResponse(response, {
+      id: createdProduct.id,
+      category: 'ACCESSORIES',
+      type: 'WHEELS'
+    });
   });
 
   test('admin cannot update product into category and type conflict', async ({ testContext }) => {
@@ -231,13 +232,10 @@ test.describe('product API', { tag: ['@suite-all', '@suite-api'] }, () => {
     const response = await testContext.api.admin.product.createProduct(product);
 
     //then
-    expect(response.status()).toBe(200);
-
-    const body = await response.json();
-
-    //then
-    expect(body.stock).toBe(0);
-    expect(body.active).toBe(false);
+    await expectOkProductResponse(response, {
+      stock: 0,
+      active: false
+    });
   });
 });
 
@@ -245,16 +243,14 @@ async function createProduct(testContext: any, product: any) {
   const response = await testContext.api.admin.product.createProduct(product);
 
   //then
-  expect(response.status()).toBe(200);
-  return response.json();
+  return expectOkProductResponse(response, product);
 }
 
 async function createRandomProduct(testContext: any, overrides = {}) {
   const response = await testContext.api.admin.product.createRandom(overrides);
 
   //then
-  expect(response.status()).toBe(200);
-  return response.json();
+  return expectOkProductResponse(response, overrides);
 }
 
 async function expectProductRejected(testContext: any, product: any, status = 400) {

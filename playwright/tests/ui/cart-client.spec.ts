@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { expectOkCartResponse, expectOkProductResponse } from '../../assertions/api-response.assertions';
 import { expectOrderToMatchCart, expectOrderToMatchCheckoutDetails } from '../../assertions/order.assertions';
 import { test } from '../../fixtures/ui.fixture';
 
@@ -18,8 +19,10 @@ test.describe('cart UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
 
     const cartBeforeCheckoutResponse = await api.cart.client.getCart();
 
-    expect(cartBeforeCheckoutResponse.status()).toBe(200);
-    const cartBeforeCheckout = await cartBeforeCheckoutResponse.json();
+    const cartBeforeCheckout = await expectOkCartResponse(cartBeforeCheckoutResponse);
+
+    //then
+    expect(cartBeforeCheckout.items).toHaveLength(1);
 
     //when
     const checkoutModal = await productPage.startCheckout();
@@ -61,12 +64,16 @@ test.describe('cart UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
       stock: 3
     });
 
-    expect(productResponse.status()).toBe(200);
-    const product = await productResponse.json();
+    const product = await expectOkProductResponse(productResponse, {
+      price: 280,
+      stock: 3
+    });
 
     const addToCartResponse = await api.cart.client.addToCart(product.id, 1);
 
-    expect(addToCartResponse.status()).toBe(200);
+    await expectOkCartResponse(addToCartResponse, [
+      { product, quantity: 1 }
+    ]);
 
     //when
     await productPage.open();
@@ -77,8 +84,9 @@ test.describe('cart UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
 
     const cartBeforeCheckoutResponse = await api.cart.client.getCart();
 
-    expect(cartBeforeCheckoutResponse.status()).toBe(200);
-    const cartBeforeCheckout = await cartBeforeCheckoutResponse.json();
+    const cartBeforeCheckout = await expectOkCartResponse(cartBeforeCheckoutResponse, [
+      { product, quantity: 1 }
+    ]);
 
     const checkoutModal = await productPage.startCheckout();
     const checkoutDetails = {
@@ -121,8 +129,10 @@ test.describe('cart UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
       stock: 3
     });
 
-    expect(guestProductResponse.status()).toBe(200);
-    const guestProduct = await guestProductResponse.json();
+    const guestProduct = await expectOkProductResponse(guestProductResponse, {
+      price: 280,
+      stock: 3
+    });
 
     const extraProductResponse = await api.product.admin.createRandom({
       name: `Extra Cart Wheels ${productSuffix}`,
@@ -132,12 +142,18 @@ test.describe('cart UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
       stock: 5
     });
 
-    expect(extraProductResponse.status()).toBe(200);
-    const extraProduct = await extraProductResponse.json();
+    const extraProduct = await expectOkProductResponse(extraProductResponse, {
+      category: 'ACCESSORIES',
+      type: 'WHEELS',
+      price: 120,
+      stock: 5
+    });
 
     const addToCartResponse = await api.cart.client.addToCart(guestProduct.id, 1);
 
-    expect(addToCartResponse.status()).toBe(200);
+    await expectOkCartResponse(addToCartResponse, [
+      { product: guestProduct, quantity: 1 }
+    ]);
 
     //when
     await productPage.open();
@@ -154,8 +170,10 @@ test.describe('cart UI', { tag: ['@suite-all', '@suite-ui'] }, () => {
 
     const cartBeforeCheckoutResponse = await api.cart.client.getCart();
 
-    expect(cartBeforeCheckoutResponse.status()).toBe(200);
-    const cartBeforeCheckout = await cartBeforeCheckoutResponse.json();
+    const cartBeforeCheckout = await expectOkCartResponse(cartBeforeCheckoutResponse, [
+      { product: guestProduct, quantity: 1 },
+      { product: extraProduct, quantity: 1 }
+    ]);
 
     const checkoutModal = await productPage.startCheckout();
     const checkoutDetails = {
