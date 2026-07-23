@@ -3,7 +3,7 @@ import { expectOrderToMatchCart, expectOrderToMatchCheckoutDetails } from '../..
 import { test } from '../../../fixtures/app.fixture';
 
 test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
-  test('client can add account cart items and pay order', async ({ testContext, freshApiClient }) => {
+  test('client can add account cart items and pay order', async ({ testContext }) => {
     //given
     const product = await createRandomProduct(testContext, {
       name: `API Account Cart Skate ${Date.now()}`,
@@ -24,7 +24,7 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
     //when
     const checkoutDetails = {
-      contactEmail: freshApiClient.email,
+      contactEmail: testContext.client.email,
       deliveryMethod: 'ADDRESS',
       deliveryAddress: 'Skate Street 10, Warsaw',
       paymentMethod: 'CARD'
@@ -50,7 +50,7 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
     expectOrderToMatchCheckoutDetails(paidOrder, checkoutDetails);
   });
 
-  test('fresh client can order product added to account cart before checkout', async ({ testContext, freshApiClient }) => {
+  test('fresh client can order product added to account cart before checkout', async ({ testContext }) => {
     //given
     const product = await createRandomProduct(testContext, {
       name: `API Account Cart Before Checkout Skate ${Date.now()}`,
@@ -58,13 +58,13 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
       stock: 3
     });
 
-    const addToCartResponse = await freshApiClient.cart.addToCart(product.id, 1);
+    const addToCartResponse = await testContext.api.client.cart.addToCart(product.id, 1);
 
     //then
     expect(addToCartResponse.status()).toBe(200);
 
     //when
-    const cartBeforeCheckoutResponse = await freshApiClient.cart.getCart();
+    const cartBeforeCheckoutResponse = await testContext.api.client.cart.getCart();
 
     //then
     expect(cartBeforeCheckoutResponse.status()).toBe(200);
@@ -77,19 +77,19 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
     //when
     const checkoutDetails = {
-      contactEmail: freshApiClient.email,
+      contactEmail: testContext.client.email,
       deliveryMethod: 'ADDRESS',
       deliveryAddress: 'Fresh Cart Street 11, Warsaw',
       paymentMethod: 'CARD'
     } as const;
-    const checkoutResponse = await freshApiClient.order.checkout(checkoutDetails);
+    const checkoutResponse = await testContext.api.client.order.checkout(checkoutDetails);
 
     //then
     expect(checkoutResponse.status()).toBe(200);
     const order = await checkoutResponse.json();
 
     //when
-    const payResponse = await freshApiClient.order.pay(order.id);
+    const payResponse = await testContext.api.client.order.pay(order.id);
 
     //then
     expect(payResponse.status()).toBe(200);
@@ -103,10 +103,7 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
     expectOrderToMatchCheckoutDetails(paidOrder, checkoutDetails);
   });
 
-  test('fresh client can order account cart product with extra product added before checkout', async ({
-    testContext,
-    freshApiClient
-  }) => {
+  test('fresh client can order account cart product with extra product added before checkout', async ({ testContext }) => {
     //given
     const productSuffix = Date.now();
     const accountProduct = await createRandomProduct(testContext, {
@@ -122,13 +119,13 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
       stock: 5
     });
 
-    const addAccountProductResponse = await freshApiClient.cart.addToCart(accountProduct.id, 1);
+    const addAccountProductResponse = await testContext.api.client.cart.addToCart(accountProduct.id, 1);
 
     //then
     expect(addAccountProductResponse.status()).toBe(200);
 
     //when
-    const oneItemCartResponse = await freshApiClient.cart.getCart();
+    const oneItemCartResponse = await testContext.api.client.cart.getCart();
 
     //then
     expect(oneItemCartResponse.status()).toBe(200);
@@ -140,13 +137,13 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
     ]);
 
     //when
-    const addExtraProductResponse = await freshApiClient.cart.addToCart(extraProduct.id, 1);
+    const addExtraProductResponse = await testContext.api.client.cart.addToCart(extraProduct.id, 1);
 
     //then
     expect(addExtraProductResponse.status()).toBe(200);
 
     //when
-    const cartBeforeCheckoutResponse = await freshApiClient.cart.getCart();
+    const cartBeforeCheckoutResponse = await testContext.api.client.cart.getCart();
 
     //then
     expect(cartBeforeCheckoutResponse.status()).toBe(200);
@@ -160,19 +157,19 @@ test.describe('cart API', { tag: ['@suite-all', '@suite-api'] }, () => {
 
     //when
     const checkoutDetails = {
-      contactEmail: freshApiClient.email,
+      contactEmail: testContext.client.email,
       deliveryMethod: 'ADDRESS',
       deliveryAddress: 'Fresh Cart Street 11, Warsaw',
       paymentMethod: 'CARD'
     } as const;
-    const checkoutResponse = await freshApiClient.order.checkout(checkoutDetails);
+    const checkoutResponse = await testContext.api.client.order.checkout(checkoutDetails);
 
     //then
     expect(checkoutResponse.status()).toBe(200);
     const order = await checkoutResponse.json();
 
     //when
-    const payResponse = await freshApiClient.order.pay(order.id);
+    const payResponse = await testContext.api.client.order.pay(order.id);
 
     //then
     expect(payResponse.status()).toBe(200);
