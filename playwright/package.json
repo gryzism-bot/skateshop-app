@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "code": "tsx exercises/live-coding.ts",
+    "code:file": "tsx",
     "test": "playwright test --config=playwright.config.ts",
     "test:api": "playwright test --config=playwright.config.ts --project=api",
     "test:ui": "playwright test --config=playwright.config.ts --project=ui",
@@ -15,7 +17,8 @@
   "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.59.1",
-    "@types/node": "^25.6.0"
+    "@types/node": "^25.6.0",
+    "tsx": "^4.23.15"
   },
   "dependencies": {
     "dotenv": "^17.4.2"
