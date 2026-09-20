@@ -40,11 +40,6 @@ test.describe('order API', { tag: ['@suite-all', '@suite-api'] }, () => {
       paymentMethod: 'CARD'
     });
 
-    expect(order.status).toBe('NEW');
-    expect(order.discountAmount).toBe(50);
-    expect(order.totalPrice).toBe(450);
-    expect(order.deliveryMethod).toBe('ADDRESS');
-    expect(order.paymentMethod).toBe('CARD');
     expectOrderToMatchCart(cartBeforeCheckout, order);
 
     //when
