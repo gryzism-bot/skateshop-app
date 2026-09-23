@@ -1,51 +1,21 @@
-type ExerciseResult<T> = {
-  name: string;
-  actual: T;
-  expected: T;
-};
+import { runEmployeeTypescriptExercises } from './employee-typescript';
+import { runGeneralTypescriptExercises } from './general-typescript';
+import { runPlaywrightSpecificExercises } from './playwright-specific';
 
-type Employee = {
-  name: string;
-  age: number;
-  department: string;
-  salary: number;
-  active: boolean;
+async function main() {
+  console.log('General TypeScript live coding exercises');
+  await runGeneralTypescriptExercises();
+
+  console.log('\nEmployee TypeScript live coding exercises');
+  await runEmployeeTypescriptExercises();
+
+  console.log('\nPlaywright-specific live coding exercises');
+  await runPlaywrightSpecificExercises();
+
+  console.log('\nAll live coding exercise groups passed.');
 }
 
-class ClassEmployee {
-
-}
-
-const employees: Employee[] = [
-  { name: 'Alice', age: 30, department: 'QA', salary: 10000, active: true },
-  { name: 'Bob', age: 25, department: 'DEV', salary: 15000, active: true },
-  { name: 'Charlie', age: 35, department: 'QA', salary: 12000, active: false },
-  { name: 'David', age: 28, department: 'DEV', salary: 18000, active: true },
-  { name: 'Eve', age: 32, department: 'QA', salary: 11000, active: true },
-  { name: 'Michael', age: 27, department: 'HR', salary: 8000, active: true }
-]
-
-
-
-function assertEquals<T>({ name, actual, expected }: ExerciseResult<T>) {
-  if (actual !== expected) {
-    throw new Error(`${name}: expected ${String(expected)}, got ${String(actual)}`);
-  }
-
-  console.log(`${name}: ok`);
-}
-
-function reverseWords(value: string) {
-  return value
-    .split(' ')
-    .reverse()
-    .join(' ');
-}
-
-assertEquals({
-  name: 'reverseWords keeps words intact and reverses their order',
-  actual: reverseWords('skates wheels bearings'),
-  expected: 'bearings wheels skates'
+main().catch(error => {
+  console.error(error);
+  process.exit(1);
 });
-
-console.log('Live coding exercise finished.');

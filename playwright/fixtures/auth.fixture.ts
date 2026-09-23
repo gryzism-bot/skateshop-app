@@ -7,11 +7,11 @@ type WorkerFixtures = {
 export const test = base.extend<{}, WorkerFixtures>({
   // Worker-scoped: cached JWT lookup for seeded users shared by tests in one worker.
   getTokenWorkerFixture: [
-    async ({}, use) => {
+    async ({ }, use) => {
 
       const baseURL = process.env.API_URL || 'http://localhost:8080';
 
-      const request = await playwrightRequest.newContext({baseURL});
+      const request = await playwrightRequest.newContext({ baseURL });
 
       const cache = new Map<string, string>();
 
@@ -25,11 +25,11 @@ export const test = base.extend<{}, WorkerFixtures>({
           admin: { email: 'admin@test.com', password: 'admin123' }
         };
 
-        const res = await request.post('/api/auth/login', {
+        const response = await request.post('/api/auth/login', {
           data: credentials[role]
         });
 
-        const token = await res.text();
+        const token = await response.text();
         cache.set(role, token);
 
         return token;
